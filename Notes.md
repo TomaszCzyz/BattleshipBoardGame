@@ -44,11 +44,20 @@ public enum Answer
 // -1-> unknown
 // 0 -> (miss)ocean
 // 1 -> (hit)ship
-public class Board 
+public class Board
 {
-    private byte[][] _board;
+    private sbyte[][] _board;
 }
 ```
 
 Pre simulation stages:
+
 * randomly place ships for both players
+
+Simulation stages
+
+1. player 1 makes a guess, player 2 answers
+2. if remaining ships of player 2 == 0 player 1 won
+3. player 2 makes a guess, player 1 answers
+4. if remaining ships of player 1 == 0 player 2 won
+5. repeat till game is over
