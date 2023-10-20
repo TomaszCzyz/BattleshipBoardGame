@@ -5,10 +5,10 @@ Battleship simulation is rather easy, but we may extend app with other simulatio
 With that assumption is mind we need to separate 'create simulation' logic from 'get simulation result' logic.
 So I can create endpoints like these:
 
-| method | url                                    | description                                    |
-|--------|----------------------------------------|------------------------------------------------|
-| POST   | /simulations/battleship/new            | starts new simulation and return simulation id |
-| GET    | /simulations/battleship/get?id={$guid} | get information about given simulation         |
+| method | url                          | description                                    |
+|--------|------------------------------|------------------------------------------------|
+| POST   | /simulations/battleship/new  | starts new simulation and return simulation id |
+| GET    | /simulations/battleship/{id} | get information about given simulation         |
 
 ### Thoughts about simulation
 
@@ -61,3 +61,38 @@ Simulation stages
 3. player 2 makes a guess, player 1 answers
 4. if remaining ships of player 1 == 0 player 2 won
 5. repeat till game is over
+
+### Simulation schema
+When I was modeling schema for simulation dto a question arose:
+if `Board` should be stored as a part of a simulation model, or should it be contained in Player model.
+
+Option 1:
+```csharp
+Simulation 
+{
+    Board BoardOfPlayer1 { get; set; };
+    Board BoardOfPlayer2 { get; set; };
+    Guess[] Guesses { get; set; }
+}
+```
+
+Option 2:
+```csharp
+Simulation 
+{
+    Player Player1 { get; set; }
+    Player Player1 { get; set; }
+}
+
+Player
+{
+    Board { get; set; }
+    Guess[] Guesses { get; set; } // different than guesses from Option 1 (contains only guesses of the player)
+}
+
+```
+
+Note: Guesses can be stored as string of comma-separated values. It will reduce model complexity and number of joins
+and improve data readability.
+
+I like the Option 2 better. It seems more natural.
