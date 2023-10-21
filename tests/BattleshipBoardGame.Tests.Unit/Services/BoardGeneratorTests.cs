@@ -4,7 +4,7 @@ using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace BattleshipBoardGame.Tests.Unit;
+namespace BattleshipBoardGame.Tests.Unit.Services;
 
 public class BoardGeneratorTests
 {
