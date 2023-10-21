@@ -8,7 +8,7 @@ public enum Strategy
     Simple = 0
 }
 
-public class BoardGenerator
+public class BoardGenerator : IBoardGenerator
 {
     private const int BoardLength = 10;
 

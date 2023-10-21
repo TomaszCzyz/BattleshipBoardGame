@@ -16,6 +16,9 @@ builder.Host.UseSerilog((_, configuration) =>
             outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3} {SourceContext}]{NewLine} {Message:lj}{NewLine}{Exception}",
             formatProvider: CultureInfo.CurrentCulture));
 
+builder.Services.AddScoped<IGuessingEngine, GuessingEngine>();
+builder.Services.AddScoped<IBoardGenerator, BoardGenerator>();
+builder.Services.AddScoped<IBattleshipGameSimulator, BattleshipGameSimulator>();
 builder.Services.AddDbContext<ISimulationsDbContext, SimulationsDbContext>(options
     => options
         .UseSqlite($"Data Source={Path.Join(Path.GetTempPath(), "simulations.db")}")
@@ -23,6 +26,13 @@ builder.Services.AddDbContext<ISimulationsDbContext, SimulationsDbContext>(optio
 
 var app = builder.Build();
 app.Logger.LogInformation("Application created. Launching application...");
+
+using var scope = app.Services.CreateScope();
+await using (var db = scope.ServiceProvider.GetRequiredService<SimulationsDbContext>())
+{
+    app.Logger.LogInformation("Executing EF migrations...");
+    db.Database.Migrate();
+}
 
 app.MapPost(
     "/simulations/battleship/new/",

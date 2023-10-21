@@ -96,3 +96,12 @@ Note: Guesses can be stored as string of comma-separated values. It will reduce 
 and improve data readability.
 
 I like the Option 2 better. It seems more natural.
+
+### Player model
+Some properties of a Player class are useful only during simulation, but there is no point is storing them.
+For example:
+* hit counter
+* guessing board
+
+I am considering splitting Player class into a Player and a PlayerDto classes. One would contain a logic
+and a second would be just for storing simulation result in db.
