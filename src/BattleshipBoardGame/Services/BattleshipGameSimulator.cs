@@ -42,19 +42,17 @@ public class BattleshipGameSimulator : IBattleshipGameSimulator
         {
             Name = "Player 1",
             Board = _boardGenerator.Generate(),
-            Guesses = new List<string>(),
+            Guesses = new List<(uint, uint)>(),
             GuessingStrategy = GuessingStrategy.Random
         };
         var player2 = new Player
         {
             Name = "Player 2",
             Board = _boardGenerator.Generate(),
-            Guesses = new List<string>(),
+            Guesses = new List<(uint, uint)>(),
             GuessingStrategy = GuessingStrategy.Random
         };
 
-        // await Task.Run(() =>
-        // {
         while (true)
         {
             if (PlayPlayerTurn(player1, player2))
@@ -67,7 +65,6 @@ public class BattleshipGameSimulator : IBattleshipGameSimulator
                 break;
             }
         }
-        // });
 
         var simulation = await _dbContext.Simulations.FindAsync(id);
         if (simulation is not null)

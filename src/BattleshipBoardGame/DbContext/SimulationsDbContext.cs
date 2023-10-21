@@ -35,7 +35,7 @@ public class SimulationsDbContext : Microsoft.EntityFrameworkCore.DbContext, ISi
             .Property(dto => dto.Guesses)
             .HasConversion(
                 guesses => JsonSerializer.Serialize(guesses, JsonSerializerOptions.Default),
-                s => JsonSerializer.Deserialize<List<string>>(s, JsonSerializerOptions.Default) ?? new List<string>(),
+                s => JsonSerializer.Deserialize<List<(uint, uint)>>(s, JsonSerializerOptions.Default) ?? new List<(uint, uint)>(),
                 new ValueComparer<IList<string>>(
                     (c1, c2) => c1 != null && c2 != null && c1.SequenceEqual(c2),
                     c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),

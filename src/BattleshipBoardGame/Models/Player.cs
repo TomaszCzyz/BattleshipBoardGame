@@ -12,7 +12,7 @@ public class Player
 
     public required sbyte[,] Board { get; init; }
 
-    public required IList<string> Guesses { get; set; }
+    public required IList<(uint, uint)> Guesses { get; set; }
 
     [NotMapped]
     public sbyte[,] GuessingBoard { get; init; } = new sbyte[10, 10];
@@ -28,7 +28,7 @@ public class Player
     ///     True - if a ship was hit,
     ///     False - when missed.
     /// </returns>
-    public bool Answer((int X, int Y) guess)
+    public bool Answer((uint X, uint Y) guess)
     {
         return Board[guess.X, guess.Y] == 1;
     }

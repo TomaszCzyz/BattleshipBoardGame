@@ -4,5 +4,5 @@ namespace BattleshipBoardGame.Services;
 
 public interface IGuessingEngine
 {
-    (int X, int Y) Guess(Player player);
+    (uint X, uint Y) Guess(Player player);
 }
