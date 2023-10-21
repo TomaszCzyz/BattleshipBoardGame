@@ -105,3 +105,9 @@ For example:
 
 I am considering splitting Player class into a Player and a PlayerDto classes. One would contain a logic
 and a second would be just for storing simulation result in db.
+
+### Unit tests
+While I was writing unit tests I realise that with current implementation simulation is not entirely testable,
+especially rounds-loop part.
+To test the simulation properly I need to be able to influence rounds results in tests.
+My idea is to introduce mockable class `Arbiter` that will be responsible for verifying rounds results.
