@@ -20,10 +20,9 @@ public class GuessingEngine : IGuessingEngine
         int x, y;
         do
         {
-            // todo: replace 'magick' number '10'
-            x = Random.Shared.Next(10);
-            y = Random.Shared.Next(10);
-        } while (player.GuessingBoard[x, y] != -1 && !player.Guesses.Contains((x, y)));
+            x = Random.Shared.Next(Constants.BoardLength);
+            y = Random.Shared.Next(Constants.BoardLength);
+        } while (player.GuessingBoard[x, y] != -1);
 
         return (x, y);
     }
