@@ -12,7 +12,14 @@ public static class Byte2dArrayExtensions
         {
             foreach (var c in row)
             {
-                sb.Append(c == 1 ? '#' : '_');
+                sb.Append(
+                    c switch
+                    {
+                        -1 => '/',
+                        0 => '_',
+                        1 => '#',
+                        _ => 'x',
+                    });
             }
 
             sb.AppendLine();

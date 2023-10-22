@@ -1,4 +1,6 @@
+using System.Text;
 using BattleshipBoardGame.Extensions;
+using BattleshipBoardGame.Models;
 using BattleshipBoardGame.Services;
 using FluentAssertions;
 using Xunit;
@@ -41,6 +43,7 @@ public class BoardGeneratorTests
 
         // Act
         var ships = _sut.GenerateShips(strategy);
+        _testOutputHelper.WriteLine(PrintShipsOnBoard(ships));
 
         // Assert
         ships.Should().HaveCount(7);
@@ -48,5 +51,25 @@ public class BoardGeneratorTests
         // number of tiles with ships is equal to 5+4+3+2+2+1+1=18
     }
 
+    private static string PrintShipsOnBoard(IEnumerable<Ship> ships)
+    {
+        var coords = ships.SelectMany(s => s.Segments).Select(s => s.Coords).ToArray();
+
+        var sb = new StringBuilder();
+
+        for (var i = 0; i < Constants.BoardLength; i++)
+        {
+            for (var j = 0; j < Constants.BoardLength; j++)
+            {
+                sb.Append(coords.Contains((i, j)) ? '#' : '_');
+            }
+
+            sb.AppendLine();
+        }
+
+        sb.AppendLine();
+
+        return sb.ToString();
+    }
     // todo: write tests checking if there is no adjacent ships
 }

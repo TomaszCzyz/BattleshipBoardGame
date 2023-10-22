@@ -10,7 +10,7 @@ public class Player
 
     public sbyte[,] GuessingBoard { get; }
 
-    public IList<(uint, uint)> Guesses { get; } = new List<(uint, uint)>();
+    public IList<(int, int)> Guesses { get; } = new List<(int, int)>();
 
     public Player(IList<Ship> ships)
     {
@@ -23,7 +23,7 @@ public class Player
     /// </summary>
     /// <param name="guess">Coordinates on the board</param>
     /// <param name="shipType">Type of sunk ship or null</param>
-    public BattleAnswer Answer((uint X, uint Y) guess, out ShipType? shipType)
+    public BattleAnswer Answer((int X, int Y) guess, out ShipType? shipType)
     {
         shipType = null;
         Ship? ship = null;
@@ -60,7 +60,7 @@ public class Player
         return BattleAnswer.HitAndSunk;
     }
 
-    public void ApplyAnswerInfo((uint X, uint Y) guess, BattleAnswer answer)
+    public void ApplyAnswerInfo((int X, int Y) guess, BattleAnswer answer)
     {
         Guesses.Add(guess);
 
@@ -82,9 +82,9 @@ public class Player
         }
     }
 
-    private void MarkTilesAroundShipSegment((uint X, uint Y) guess)
+    private void MarkTilesAroundShipSegment((int X, int Y) guess)
     {
-        var (x, y) = ((int)guess.X, (int)guess.Y);
+        var (x, y) = (guess.X, guess.Y);
         GuessingBoard[x, y] = 3;
 
         foreach (var (i, j) in Constants.NeighborTilesRelativeCoords)
@@ -98,7 +98,7 @@ public class Player
             var value = GuessingBoard[x + i, y + j];
             if (value == 1)
             {
-                MarkTilesAroundShipSegment(((uint)(x + i), (uint)(y + j)));
+                MarkTilesAroundShipSegment((x + i, y + j));
             }
             else if (value == -1)
             {

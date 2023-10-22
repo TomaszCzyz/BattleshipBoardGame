@@ -7,23 +7,23 @@ namespace BattleshipBoardGame.Services;
 [UsedImplicitly]
 public class GuessingEngine : IGuessingEngine
 {
-    public (uint X, uint Y) Guess(Player player)
+    public (int X, int Y) Guess(Player player)
         => player.GuessingStrategy switch
         {
             GuessingStrategy.Random => GuessRandomly(player),
             _ => throw new ArgumentOutOfRangeException(nameof(player), player, "Unknown guessing strategy")
         };
 
-    private static (uint X, uint Y) GuessRandomly(Player player)
+    private static (int X, int Y) GuessRandomly(Player player)
     {
         EnsureCanGuess(player.GuessingBoard);
-        uint x, y;
+        int x, y;
         do
         {
             // todo: replace 'magick' number '10'
-            x = (uint)Random.Shared.Next(10);
-            y = (uint)Random.Shared.Next(10);
-        } while (player.GuessingBoard[x, y] == -1 && !player.Guesses.Contains((x, y)));
+            x = Random.Shared.Next(10);
+            y = Random.Shared.Next(10);
+        } while (player.GuessingBoard[x, y] != -1 && !player.Guesses.Contains((x, y)));
 
         return (x, y);
     }

@@ -66,7 +66,10 @@ public class BoardGenerator : IBoardGenerator
             var qty = 0;
             while (qty != _shipQty[shipType])
             {
-                var ship = GenerateShip(shipType);
+                Ship? ship;
+                while (!TryGenerateShip(shipType, out ship))
+                {
+                }
 
                 if (!CanPlaceShip2(ship, ships))
                 {
@@ -84,7 +87,7 @@ public class BoardGenerator : IBoardGenerator
     /// <summary>
     ///     Checks if there is a collision with another ship.
     /// </summary>
-    private static bool CanPlaceShip2(Ship ship, List<Ship> ships)
+    private static bool CanPlaceShip2(Ship ship, IEnumerable<Ship> ships)
     {
         var alreadyPlaced = ships.SelectMany(s => s.Segments).Select(segment => segment.Coords).ToArray();
 
@@ -92,7 +95,7 @@ public class BoardGenerator : IBoardGenerator
         {
             // check if there is a ship segment at this coordinates or coordinates adjacent to it.
             var forbiddenCoords = Constants.NeighborTilesRelativeCoords
-                .Select(relative => (coords.X + relative.I, coords.X + relative.J))
+                .Select(relative => (coords.X + relative.I, coords.Y + relative.J))
                 .Append(coords)
                 .ToArray();
 
@@ -105,8 +108,9 @@ public class BoardGenerator : IBoardGenerator
         return true;
     }
 
-    private static Ship GenerateShip(ShipType shipType)
+    private static bool TryGenerateShip(ShipType shipType, [NotNullWhen(true)] out Ship? ship)
     {
+        ship = null;
         var x = Random.Shared.Next(BoardLength);
         var y = Random.Shared.Next(BoardLength);
         var dir = (Dir)Random.Shared.Next(4);
@@ -117,9 +121,9 @@ public class BoardGenerator : IBoardGenerator
         var (xCoords, yCoords) = dir switch
         {
             Dir.Up => (relativeCoords.Select(i => x - i), Enumerable.Repeat(y, len)),
-            Dir.Right => (relativeCoords.Select(i => y + i), Enumerable.Repeat(x, len)),
+            Dir.Right => (Enumerable.Repeat(x, len), relativeCoords.Select(i => y + i)),
             Dir.Down => (relativeCoords.Select(i => x + i), Enumerable.Repeat(y, len)),
-            Dir.Left => (relativeCoords.Select(i => y - i), Enumerable.Repeat(x, len)),
+            Dir.Left => (Enumerable.Repeat(x, len), relativeCoords.Select(i => y - i)),
             _ => throw new UnreachableException()
         };
 
@@ -130,13 +134,14 @@ public class BoardGenerator : IBoardGenerator
             // if random points and direction result in ship being outside board bounds, repeat
             if (i < 0 || j < 0 || i >= BoardLength || j >= BoardLength)
             {
-                GenerateShip(shipType);
+                return false;
             }
 
-            shipSegments.Add(new ShipSegment { Coords = ((uint)i, (uint)j), IsSunk = false });
+            shipSegments.Add(new ShipSegment { Coords = (i, j), IsSunk = false });
         }
 
-        return new Ship(shipType, shipSegments);
+        ship = new Ship(shipType, shipSegments);
+        return true;
     }
 
     /// <summary>

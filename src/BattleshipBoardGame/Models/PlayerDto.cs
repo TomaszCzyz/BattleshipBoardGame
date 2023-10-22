@@ -8,5 +8,5 @@ public class PlayerDto
 
     public required IList<Ship> Ships { get; init; }
 
-    public required IList<(uint, uint)> Guesses { get; init; }
+    public required IList<(int, int)> Guesses { get; init; }
 }
