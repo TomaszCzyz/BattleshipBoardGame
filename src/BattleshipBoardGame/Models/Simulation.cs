@@ -6,7 +6,7 @@ public class Simulation
 
     public required bool IsFinished { get; set; }
 
-    public Player? Player1 { get; set; }
+    public PlayerDto? Player1 { get; set; }
 
-    public Player? Player2 { get; set; }
+    public PlayerDto? Player2 { get; set; }
 }

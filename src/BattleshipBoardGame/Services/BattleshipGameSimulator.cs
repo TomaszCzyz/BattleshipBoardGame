@@ -1,4 +1,5 @@
-﻿using BattleshipBoardGame.DbContext;
+﻿using System.Diagnostics;
+using BattleshipBoardGame.DbContext;
 using BattleshipBoardGame.Models;
 using JetBrains.Annotations;
 
@@ -38,34 +39,88 @@ public class BattleshipGameSimulator : IBattleshipGameSimulator
     {
         _logger.LogInformation("Starting new simulation with id {SimulationId}", id);
 
-        var player1 = new Player
+        // todo: get player's settings from POST's body
+        var playerInfo1 = new PlayerInfo
         {
             Name = "Player 1",
-            Board = _boardGenerator.Generate(),
-            Guesses = new List<(uint, uint)>(),
-            GuessingStrategy = GuessingStrategy.Random
+            GuessingStrategy = GuessingStrategy.Random,
+            ShipsPlacementStrategy = ShipsPlacementStrategy.Simple
         };
-        var player2 = new Player
+        var playerInfo2 = new PlayerInfo
         {
             Name = "Player 2",
-            Board = _boardGenerator.Generate(),
-            Guesses = new List<(uint, uint)>(),
-            GuessingStrategy = GuessingStrategy.Random
+            GuessingStrategy = GuessingStrategy.Random,
+            ShipsPlacementStrategy = ShipsPlacementStrategy.Simple
         };
 
-        while (true)
+        var (player1, player2) = CreatePlayers(playerInfo1, playerInfo2);
+
+        RunSimulation(player1, player2);
+
+        var playerDto1 = new PlayerDto
         {
-            if (PlayPlayerTurn(player1, player2))
-            {
-                break;
-            }
+            Id = id,
+            PlayerInfo = playerInfo1,
+            Ships = player1.Ships.ToList(),
+            Guesses = player1.Guesses.ToList()
+        };
 
-            if (PlayPlayerTurn(player2, player1))
-            {
-                break;
-            }
-        }
+        var playerDto2 = new PlayerDto
+        {
+            Id = id,
+            PlayerInfo = playerInfo2,
+            Ships = player2.Ships.ToList(),
+            Guesses = player2.Guesses.ToList()
+        };
 
+        await UpdateResults(id, playerDto1, playerDto2);
+    }
+
+    private (Player Player1, Player Player2) CreatePlayers(PlayerInfo playerInfo1, PlayerInfo playerInfo2)
+    {
+        var generateShips1 = _boardGenerator.GenerateShips(playerInfo1.ShipsPlacementStrategy);
+        var generateShips2 = _boardGenerator.GenerateShips(playerInfo2.ShipsPlacementStrategy);
+
+        return (new Player(generateShips1), new Player(generateShips2));
+    }
+
+    private void RunSimulation(Player player1, Player player2)
+    {
+        BattleAnswer answerOfPlayer1, answerOfPlayer2;
+        var counter = 0;
+        do
+        {
+            counter++;
+            answerOfPlayer2 = PlayTurn(player1, player2);
+            answerOfPlayer1 = PlayTurn(player2, player1);
+        } while (answerOfPlayer1 != BattleAnswer.HitAndWholeFleetSunk && answerOfPlayer2 != BattleAnswer.HitAndWholeFleetSunk);
+
+        var message = (answerOfPlayer1, answerOfPlayer2) switch
+        {
+            (BattleAnswer.HitAndWholeFleetSunk, BattleAnswer.HitAndWholeFleetSunk) => "It is a draw!!!",
+            (BattleAnswer.HitAndWholeFleetSunk, _) => "Player 2 wins!",
+            (_, BattleAnswer.HitAndWholeFleetSunk) => "Player 1 wins!",
+            _ => throw new UnreachableException()
+        };
+
+        _logger.LogInformation("Simulation ended in {RoundsNumber} with result: {Message}", counter, message);
+    }
+
+    private BattleAnswer PlayTurn(Player guessingPlayer, Player answeringPlayer)
+    {
+        var guess = _guessingEngine.Guess(guessingPlayer);
+        _logger.LogInformation("Guessing: {Coords}", guess);
+
+        var answer = answeringPlayer.Answer(guess, out _);
+        _logger.LogInformation("Answer: {Answer}", answer);
+
+        guessingPlayer.ApplyAnswerInfo(guess, answer);
+
+        return answer;
+    }
+
+    private async Task UpdateResults(Guid id, PlayerDto player1, PlayerDto player2)
+    {
         var simulation = await _dbContext.Simulations.FindAsync(id);
         if (simulation is not null)
         {
@@ -86,30 +141,5 @@ public class BattleshipGameSimulator : IBattleshipGameSimulator
         }
 
         _dbContext.SaveChanges();
-    }
-
-    private bool PlayPlayerTurn(Player guessingPlayer, Player answeringPlayer)
-    {
-        var guess = _guessingEngine.Guess(guessingPlayer);
-        if (answeringPlayer.Answer(guess))
-        {
-            guessingPlayer.GuessingBoard[guess.X, guess.Y] = 1;
-            _logger.LogInformation("{PlayerName} guessed: {Point} and it was a hit", guessingPlayer.Name, guess);
-            answeringPlayer.HitCounter++;
-
-            // todo: move this logic to Player as it is player's responsibility to know when all ships have sunk
-            if (answeringPlayer.HitCounter == 18)
-            {
-                _logger.LogInformation("{PlayerName} lost!", guessingPlayer.Name);
-                return true;
-            }
-        }
-        else
-        {
-            guessingPlayer.GuessingBoard[guess.X, guess.Y] = 0;
-            _logger.LogInformation("{PlayerName} guessed: {Point} and it was a miss", guessingPlayer.Name, guess);
-        }
-
-        return false;
     }
 }
