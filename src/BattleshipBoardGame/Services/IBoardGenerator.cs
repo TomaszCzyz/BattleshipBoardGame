@@ -1,6 +1,10 @@
-﻿namespace BattleshipBoardGame.Services;
+﻿using BattleshipBoardGame.Models;
+
+namespace BattleshipBoardGame.Services;
 
 public interface IBoardGenerator
 {
-    public sbyte[,] Generate(Strategy strategy = Strategy.Simple);
+    public sbyte[,] Generate(ShipsPlacementStrategy strategy = ShipsPlacementStrategy.Simple);
+
+    public IList<Ship> GenerateShips(ShipsPlacementStrategy strategy = ShipsPlacementStrategy.Simple);
 }

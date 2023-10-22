@@ -20,7 +20,7 @@ public class BoardGeneratorTests
     public void Generate_StrategySimple_ReturnsValidBoard()
     {
         // Arrange
-        var strategy = Strategy.Simple;
+        var strategy = ShipsPlacementStrategy.Simple;
 
         // Act
         var board = _sut.Generate(strategy);
@@ -31,6 +31,21 @@ public class BoardGeneratorTests
         board.EnumerateRows().Should().HaveCount(10);
         // number of tiles with ships is equal to 5+4+3+2+2+1+1=18
         board.EnumerateRows().SelectMany(bytes => bytes).Where(b => b == 1).Should().HaveCount(18);
+    }
+
+    [Fact]
+    public void GenerateShips_StrategySimple_ReturnsValidShipsList()
+    {
+        // Arrange
+        var strategy = ShipsPlacementStrategy.Simple;
+
+        // Act
+        var ships = _sut.GenerateShips(strategy);
+
+        // Assert
+        ships.Should().HaveCount(7);
+        ships.SelectMany(ship => ship.Segments).Should().HaveCount(18);
+        // number of tiles with ships is equal to 5+4+3+2+2+1+1=18
     }
 
     // todo: write tests checking if there is no adjacent ships

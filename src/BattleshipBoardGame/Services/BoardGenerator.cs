@@ -1,9 +1,10 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using BattleshipBoardGame.Models;
 
 namespace BattleshipBoardGame.Services;
 
-public enum Strategy
+public enum ShipsPlacementStrategy
 {
     Simple = 0
 }
@@ -35,12 +36,108 @@ public class BoardGenerator : IBoardGenerator
     private static readonly (int, int)[] _neighborTiles
         = { (-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1), (0, -1), (-1, -1) };
 
-    public sbyte[,] Generate(Strategy strategy = Strategy.Simple)
+    public sbyte[,] Generate(ShipsPlacementStrategy strategy = ShipsPlacementStrategy.Simple)
         => strategy switch
         {
-            Strategy.Simple => GenerateSimple(),
+            ShipsPlacementStrategy.Simple => GenerateSimple(),
             _ => throw new ArgumentOutOfRangeException(nameof(strategy), strategy, $"No implementation for strategy {strategy} yet.")
         };
+
+    public IList<Ship> GenerateShips(ShipsPlacementStrategy strategy = ShipsPlacementStrategy.Simple)
+        => strategy switch
+        {
+            ShipsPlacementStrategy.Simple => GenerateShipsSimple(),
+            _ => throw new ArgumentOutOfRangeException(nameof(strategy), strategy, $"No implementation for strategy {strategy} yet.")
+        };
+
+    /// <summary>
+    ///     Naive implementation of ships placements calculations.
+    ///     For each <see cref="ShipType" /> we randomly choose a point on a board and a direction.
+    ///     Then we check if there is no collision with edge or another ship. If there is a collision,
+    ///     then we repeat the draw.
+    /// </summary>
+    /// <returns>A board with ships placement</returns>
+    private static List<Ship> GenerateShipsSimple()
+    {
+        var ships = new List<Ship>();
+
+        foreach (var shipType in Enum.GetValues<ShipType>())
+        {
+            var qty = 0;
+            while (qty != _shipQty[shipType])
+            {
+                var ship = GenerateShip(shipType);
+
+                if (!CanPlaceShip2(ship, ships))
+                {
+                    continue;
+                }
+
+                ships.Add(ship);
+                qty++;
+            }
+        }
+
+        return ships;
+    }
+
+    /// <summary>
+    ///     Checks if there is a collision with another ship.
+    /// </summary>
+    private static bool CanPlaceShip2(Ship ship, List<Ship> ships)
+    {
+        var alreadyPlaced = ships.SelectMany(s => s.Segments).Select(segment => segment.Coords).ToArray();
+
+        foreach (var coords in ship.Segments.Select(s => s.Coords))
+        {
+            // check if there is a ship segment at this coordinates or coordinates adjacent to it.
+            var forbiddenCoords = Constants.NeighborTilesRelativeCoords
+                .Select(relative => (coords.X + relative.I, coords.X + relative.J))
+                .Append(coords)
+                .ToArray();
+
+            if (alreadyPlaced.Any(c => forbiddenCoords.Contains(c)))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static Ship GenerateShip(ShipType shipType)
+    {
+        var x = Random.Shared.Next(BoardLength);
+        var y = Random.Shared.Next(BoardLength);
+        var dir = (Dir)Random.Shared.Next(4);
+
+        var len = (int)_shipSizes[shipType];
+        var relativeCoords = Enumerable.Range(0, len).ToArray();
+
+        var (xCoords, yCoords) = dir switch
+        {
+            Dir.Up => (relativeCoords.Select(i => x - i), Enumerable.Repeat(y, len)),
+            Dir.Right => (relativeCoords.Select(i => y + i), Enumerable.Repeat(x, len)),
+            Dir.Down => (relativeCoords.Select(i => x + i), Enumerable.Repeat(y, len)),
+            Dir.Left => (relativeCoords.Select(i => y - i), Enumerable.Repeat(x, len)),
+            _ => throw new UnreachableException()
+        };
+
+        var shipSegments = new List<ShipSegment>();
+
+        foreach (var (i, j) in xCoords.Zip(yCoords))
+        {
+            // if random points and direction result in ship being outside board bounds, repeat
+            if (i < 0 || j < 0 || i >= BoardLength || j >= BoardLength)
+            {
+                GenerateShip(shipType);
+            }
+
+            shipSegments.Add(new ShipSegment { Coords = ((uint)i, (uint)j), IsSunk = false });
+        }
+
+        return new Ship(shipType, shipSegments);
+    }
 
     /// <summary>
     ///     Naive implementation of ships placements calculations.
@@ -74,7 +171,7 @@ public class BoardGenerator : IBoardGenerator
     /// <summary>
     ///     To check if ship can be placed we first check, if it fits in board bounds
     ///     and then we check if each tile of the ship would not be adjacent to other ship.
-    ///     There are overlapping checks, however in strategy <see cref="Strategy.Simple"/> we go for
+    ///     There are overlapping checks, however in strategy <see cref="ShipsPlacementStrategy.Simple"/> we go for
     ///     simplicity of implementation.
     /// </summary>
     private static bool CanPlaceShip(ShipType shipType, ref sbyte[,] board, [NotNullWhen(true)] out (int, int, Dir)? pointAndDir)
