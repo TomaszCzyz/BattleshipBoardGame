@@ -55,7 +55,7 @@ public class BattleshipGameSimulator : IBattleshipGameSimulator
 
         var (player1, player2) = CreatePlayers(playerInfo1, playerInfo2);
 
-        RunSimulation(player1, player2);
+        var winner = RunSimulation(player1, player2);
 
         var playerDto1 = new PlayerDto
         {
@@ -73,7 +73,8 @@ public class BattleshipGameSimulator : IBattleshipGameSimulator
             Guesses = player2.Guesses.ToList()
         };
 
-        await UpdateResults(id, playerDto1, playerDto2);
+        var winnerDto = player1 == winner ? playerDto1 : playerDto2;
+        await UpdateResults(id, playerDto1, playerDto2, winnerDto);
     }
 
     private (Player Player1, Player Player2) CreatePlayers(PlayerInfo playerInfo1, PlayerInfo playerInfo2)
@@ -84,7 +85,7 @@ public class BattleshipGameSimulator : IBattleshipGameSimulator
         return (new Player(generateShips1), new Player(generateShips2));
     }
 
-    private void RunSimulation(Player player1, Player player2)
+    private Player? RunSimulation(Player player1, Player player2)
     {
         BattleAnswer answerOfPlayer1, answerOfPlayer2;
         var counter = 0;
@@ -95,15 +96,17 @@ public class BattleshipGameSimulator : IBattleshipGameSimulator
             answerOfPlayer1 = PlayTurn(player2, player1);
         } while (answerOfPlayer1 != BattleAnswer.HitAndWholeFleetSunk && answerOfPlayer2 != BattleAnswer.HitAndWholeFleetSunk);
 
-        var message = (answerOfPlayer1, answerOfPlayer2) switch
+        var (message, winner) = (answerOfPlayer1, answerOfPlayer2) switch
         {
-            (BattleAnswer.HitAndWholeFleetSunk, BattleAnswer.HitAndWholeFleetSunk) => "It is a draw!!!",
-            (BattleAnswer.HitAndWholeFleetSunk, _) => "Player 2 wins!",
-            (_, BattleAnswer.HitAndWholeFleetSunk) => "Player 1 wins!",
+            (BattleAnswer.HitAndWholeFleetSunk, BattleAnswer.HitAndWholeFleetSunk) => ("It is a draw!!!", null),
+            (BattleAnswer.HitAndWholeFleetSunk, _) => ("Player 2 wins!", player2),
+            (_, BattleAnswer.HitAndWholeFleetSunk) => ("Player 1 wins!", player1),
             _ => throw new UnreachableException()
         };
 
         _logger.LogInformation("Simulation ended in {RoundsNumber} with result: {Message}", counter, message);
+
+        return winner;
     }
 
     private BattleAnswer PlayTurn(Player guessingPlayer, Player answeringPlayer)
@@ -119,7 +122,7 @@ public class BattleshipGameSimulator : IBattleshipGameSimulator
         return answer;
     }
 
-    private async Task UpdateResults(Guid id, PlayerDto player1, PlayerDto player2)
+    private async Task UpdateResults(Guid id, PlayerDto player1, PlayerDto player2, PlayerDto winner)
     {
         var simulation = await _dbContext.Simulations.FindAsync(id);
         if (simulation is not null)
@@ -127,6 +130,7 @@ public class BattleshipGameSimulator : IBattleshipGameSimulator
             simulation.IsFinished = true;
             simulation.Player1 = player1;
             simulation.Player2 = player2;
+            simulation.Winner = winner;
         }
         else
         {
@@ -136,7 +140,8 @@ public class BattleshipGameSimulator : IBattleshipGameSimulator
                     Id = id,
                     IsFinished = true,
                     Player1 = player1,
-                    Player2 = player2
+                    Player2 = player2,
+                    Winner = winner
                 });
         }
 
