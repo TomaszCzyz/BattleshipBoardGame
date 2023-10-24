@@ -87,20 +87,20 @@ public class BattleshipGameSimulator : IBattleshipGameSimulator
 
     private Player? RunSimulation(Player player1, Player player2)
     {
-        BattleAnswer answerOfPlayer1, answerOfPlayer2;
+        PlayerAnswer answerOfPlayer1, answerOfPlayer2;
         var counter = 0;
         do
         {
             counter++;
             answerOfPlayer2 = PlayTurn(player1, player2);
             answerOfPlayer1 = PlayTurn(player2, player1);
-        } while (answerOfPlayer1 != BattleAnswer.HitAndWholeFleetSunk && answerOfPlayer2 != BattleAnswer.HitAndWholeFleetSunk);
+        } while (answerOfPlayer1 != PlayerAnswer.HitAndWholeFleetSunk && answerOfPlayer2 != PlayerAnswer.HitAndWholeFleetSunk);
 
         var (message, winner) = (answerOfPlayer1, answerOfPlayer2) switch
         {
-            (BattleAnswer.HitAndWholeFleetSunk, BattleAnswer.HitAndWholeFleetSunk) => ("It is a draw!!!", null),
-            (BattleAnswer.HitAndWholeFleetSunk, _) => ("Player 2 wins!", player2),
-            (_, BattleAnswer.HitAndWholeFleetSunk) => ("Player 1 wins!", player1),
+            (PlayerAnswer.HitAndWholeFleetSunk, PlayerAnswer.HitAndWholeFleetSunk) => ("It is a draw!!!", null),
+            (PlayerAnswer.HitAndWholeFleetSunk, _) => ("Player 2 wins!", player2),
+            (_, PlayerAnswer.HitAndWholeFleetSunk) => ("Player 1 wins!", player1),
             _ => throw new UnreachableException()
         };
 
@@ -109,7 +109,7 @@ public class BattleshipGameSimulator : IBattleshipGameSimulator
         return winner;
     }
 
-    private BattleAnswer PlayTurn(Player guessingPlayer, Player answeringPlayer)
+    private PlayerAnswer PlayTurn(Player guessingPlayer, Player answeringPlayer)
     {
         var guess = _guessingEngine.Guess(guessingPlayer.GuessingBoard, guessingPlayer.GuessingStrategy);
         _logger.LogInformation("Guessing: {Coords}", guess);

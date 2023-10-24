@@ -1,6 +1,6 @@
 namespace BattleshipBoardGame.Models;
 
-public enum BattleAnswer
+public enum PlayerAnswer
 {
     Miss = 0,
     HitNotSunk = 1,

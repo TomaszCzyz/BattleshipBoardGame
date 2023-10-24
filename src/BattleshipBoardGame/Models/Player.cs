@@ -48,7 +48,7 @@ public class Player
     /// </summary>
     /// <param name="guess">Coordinates on the board</param>
     /// <param name="shipType">Type of a sunk ship or null</param>
-    public BattleAnswer Answer((int X, int Y) guess, out ShipType? shipType)
+    public PlayerAnswer Answer((int X, int Y) guess, out ShipType? shipType)
     {
         shipType = null;
         Ship? ship = null;
@@ -68,21 +68,21 @@ public class Player
 
         if (ship is null)
         {
-            return BattleAnswer.Miss;
+            return PlayerAnswer.Miss;
         }
 
         if (_ships.SelectMany(s => s.Segments).All(seg => seg.IsSunk))
         {
-            return BattleAnswer.HitAndWholeFleetSunk;
+            return PlayerAnswer.HitAndWholeFleetSunk;
         }
 
         if (!ship.Segments.All(segment => segment.IsSunk))
         {
-            return BattleAnswer.HitNotSunk;
+            return PlayerAnswer.HitNotSunk;
         }
 
         shipType = ship.Type;
-        return BattleAnswer.HitAndSunk;
+        return PlayerAnswer.HitAndSunk;
     }
 
     /// <summary>
@@ -91,25 +91,25 @@ public class Player
     /// <param name="guess">a guess to which we have an answer</param>
     /// <param name="answer">the answer to our guess</param>
     /// <exception cref="ArgumentOutOfRangeException">when we receive an unknown answer</exception>
-    public void ApplyAnswerInfo((int X, int Y) guess, BattleAnswer answer)
+    public void ApplyAnswerInfo((int X, int Y) guess, PlayerAnswer answer)
     {
         Guesses.Add(guess);
 
         switch (answer)
         {
-            case BattleAnswer.Miss:
+            case PlayerAnswer.Miss:
                 GuessingBoard[guess.X, guess.Y] = 0;
                 break;
-            case BattleAnswer.HitAndWholeFleetSunk:
-            case BattleAnswer.HitNotSunk:
+            case PlayerAnswer.HitAndWholeFleetSunk:
+            case PlayerAnswer.HitNotSunk:
                 GuessingBoard[guess.X, guess.Y] = 1;
                 break;
-            case BattleAnswer.HitAndSunk:
+            case PlayerAnswer.HitAndSunk:
                 GuessingBoard[guess.X, guess.Y] = 1;
                 MarkTilesAroundShipSegment(guess);
                 break;
             default:
-                throw new ArgumentOutOfRangeException(nameof(answer), answer, $"Unknown {nameof(BattleAnswer)}");
+                throw new ArgumentOutOfRangeException(nameof(answer), answer, $"Unknown {nameof(PlayerAnswer)}");
         }
     }
 
