@@ -7,22 +7,42 @@ namespace BattleshipBoardGame.Services;
 [UsedImplicitly]
 public class GuessingEngine : IGuessingEngine
 {
-    public (int X, int Y) Guess(Player player)
-        => player.GuessingStrategy switch
+    /// <summary>
+    ///     Makes a guess based on provided strategy.
+    /// </summary>
+    /// <returns>
+    ///     Coordinates within a <paramref name="guessingBoard"/>
+    /// </returns>
+    /// <exception cref="ArgumentOutOfRangeException">
+    ///     No implementation for given <paramref name="guessingStrategy" />
+    /// </exception>
+    /// <exception cref="ArgumentException">
+    ///     No valid guess can be make,
+    ///     because there is no unknown point on the <paramref name="guessingBoard"/>,
+    ///     <see cref="EnsureCanGuess"/>.
+    /// </exception>
+    public (int X, int Y) Guess(sbyte[,] guessingBoard, GuessingStrategy guessingStrategy)
+    {
+        EnsureCanGuess(guessingBoard);
+
+        return GuessInner(guessingBoard, guessingStrategy);
+    }
+
+    private static (int X, int Y) GuessInner(sbyte[,] guessingBoard, GuessingStrategy guessingStrategy)
+        => guessingStrategy switch
         {
-            GuessingStrategy.Random => GuessRandomly(player),
-            _ => throw new ArgumentOutOfRangeException(nameof(player), player, "Unknown guessing strategy")
+            GuessingStrategy.Random => GuessRandomly(guessingBoard),
+            _ => throw new ArgumentOutOfRangeException(nameof(guessingStrategy), guessingStrategy, "Unknown guessing strategy")
         };
 
-    private static (int X, int Y) GuessRandomly(Player player)
+    private static (int X, int Y) GuessRandomly(sbyte[,] guessingBoard)
     {
-        EnsureCanGuess(player.GuessingBoard);
         int x, y;
         do
         {
-            x = Random.Shared.Next(Constants.BoardLength);
-            y = Random.Shared.Next(Constants.BoardLength);
-        } while (player.GuessingBoard[x, y] != -1);
+            x = Random.Shared.Next(guessingBoard.GetLength(0));
+            y = Random.Shared.Next(guessingBoard.GetLength(1));
+        } while (guessingBoard[x, y] != -1);
 
         return (x, y);
     }

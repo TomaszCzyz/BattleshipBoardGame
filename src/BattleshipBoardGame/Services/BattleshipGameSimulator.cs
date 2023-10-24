@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using BattleshipBoardGame.DbContext;
-using BattleshipBoardGame.Extensions;
 using BattleshipBoardGame.Models;
 using JetBrains.Annotations;
 
@@ -109,7 +108,7 @@ public class BattleshipGameSimulator : IBattleshipGameSimulator
 
     private BattleAnswer PlayTurn(Player guessingPlayer, Player answeringPlayer)
     {
-        var guess = _guessingEngine.Guess(guessingPlayer);
+        var guess = _guessingEngine.Guess(guessingPlayer.GuessingBoard, guessingPlayer.GuessingStrategy);
         _logger.LogInformation("Guessing: {Coords}", guess);
 
         var answer = answeringPlayer.Answer(guess, out _);

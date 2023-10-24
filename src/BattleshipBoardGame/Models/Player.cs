@@ -1,3 +1,5 @@
+using BattleshipBoardGame.Helpers;
+
 namespace BattleshipBoardGame.Models;
 
 public class Player
@@ -15,7 +17,7 @@ public class Player
     public Player(IList<Ship> ships)
     {
         _ships = ships;
-        GuessingBoard = Initialize2DArray();
+        GuessingBoard = Array2dHelpers.Initialize(Constants.BoardLength);
     }
 
     /// <summary>
@@ -105,20 +107,5 @@ public class Player
                 GuessingBoard[x + i, y + j] = 2;
             }
         }
-    }
-
-    private static sbyte[,] Initialize2DArray(sbyte value = -1)
-    {
-        var board = new sbyte[10, 10];
-
-        foreach (var row in Enumerable.Range(0, 10))
-        {
-            foreach (var col in Enumerable.Range(0, 10))
-            {
-                board[row, col] = value;
-            }
-        }
-
-        return board;
     }
 }
