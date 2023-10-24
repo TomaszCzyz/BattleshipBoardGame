@@ -158,9 +158,22 @@ For example:
 I am considering splitting Player class into a Player and a PlayerDto classes. One would contain a logic
 and a second would be just for storing simulation result in db.
 
+QUESTION: Should player throw an exception from method `ApplyAnswerInfo` when gets unknown answer?
+probably no... but currently does (easy change, not important to the task I think)
+
 ### Unit tests
 
 While I was writing unit tests I realise that with current implementation simulation is not entirely testable,
 especially rounds-loop part.
 To test the simulation properly I need to be able to influence rounds results in tests.
 My idea is to introduce mockable class `Arbiter` that will be responsible for verifying rounds results.
+
+
+### Afterward thoughts
+
+These are quick thoughts how I could possibly improve design/architecture.  
+I think it would be more flexible if simulation itself would store a `State`, e.g. player's boards.
+In that way `Player` would only store essential information about himself, such as his strategy of guessing
+or ships placement strategy. Also testing would be easier I think. And in the case of extending a service to
+more games, we could just add a new player type, without need break existing one. The simulation would take a different 
+type of `State` too.

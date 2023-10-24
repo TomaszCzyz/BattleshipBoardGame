@@ -1,5 +1,10 @@
 namespace BattleshipBoardGame.Models;
 
+/// <summary>
+///     A model that stores information about player
+///     and minimal information, that can be used to
+///     reconstruct simulation.
+/// </summary>
 public class PlayerDto
 {
     public required Guid Id { get; init; }

@@ -2,6 +2,9 @@ using BattleshipBoardGame.Services;
 
 namespace BattleshipBoardGame.Models;
 
+/// <summary>
+///     Basic information about player
+/// </summary>
 public class PlayerInfo
 {
     public required string Name { get; init; }

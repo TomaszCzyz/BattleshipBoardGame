@@ -1,5 +1,8 @@
 ﻿namespace BattleshipBoardGame.Models;
 
+/// <summary>
+///     Stores information about simulation
+/// </summary>
 public class Simulation
 {
     public required Guid Id { get; set; }

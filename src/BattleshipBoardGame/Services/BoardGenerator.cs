@@ -9,6 +9,10 @@ public enum ShipsPlacementStrategy
     Simple = 0
 }
 
+/// <summary>
+///     A class with logic for generating classic Battleship board
+///     containing 5 types of ships, 7 ships total.
+/// </summary>
 public class BoardGenerator : IBoardGenerator
 {
     private static readonly Dictionary<ShipType, uint> _shipSizes

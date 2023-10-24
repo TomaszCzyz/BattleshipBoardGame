@@ -2,18 +2,41 @@ using BattleshipBoardGame.Helpers;
 
 namespace BattleshipBoardGame.Models;
 
+/// <summary>
+///     A class representing a player and its game preferences.
+///     It is responsible for tracking his game progress and
+///     updating its state based on information from opponent.
+/// </summary>
 public class Player
 {
     private readonly IList<Ship> _ships;
 
+    /// <summary>
+    ///     A list of player's ships for reference.
+    /// </summary>
     public IReadOnlyList<Ship> Ships => _ships.AsReadOnly();
 
+    /// <summary>
+    ///     The guessing strategy of the player.
+    ///     Note, that the guessing itself is realised by different class
+    ///     so the strategy might change during the game.
+    /// </summary>
     public GuessingStrategy GuessingStrategy { get; } = GuessingStrategy.Random;
 
+    /// <summary>
+    ///     Keeps track of guessed coords, hit ships and coords that cannot contain ship
+    /// </summary>
     public sbyte[,] GuessingBoard { get; }
 
+    /// <summary>
+    ///     Guesses of the player in an order (first guess at the index 0)
+    /// </summary>
     public IList<(int, int)> Guesses { get; } = new List<(int, int)>();
 
+    /// <summary>
+    ///     Initializes a player with a given list of ships and a <see cref="GuessingBoard"/>
+    ///     with all tiles set to 'unknown' state
+    /// </summary>
     public Player(IList<Ship> ships)
     {
         _ships = ships;
@@ -24,7 +47,7 @@ public class Player
     ///     Answers to another player's guess.
     /// </summary>
     /// <param name="guess">Coordinates on the board</param>
-    /// <param name="shipType">Type of sunk ship or null</param>
+    /// <param name="shipType">Type of a sunk ship or null</param>
     public BattleAnswer Answer((int X, int Y) guess, out ShipType? shipType)
     {
         shipType = null;
@@ -62,6 +85,12 @@ public class Player
         return BattleAnswer.HitAndSunk;
     }
 
+    /// <summary>
+    ///     Updates progress using received answer.
+    /// </summary>
+    /// <param name="guess">a guess to which we have an answer</param>
+    /// <param name="answer">the answer to our guess</param>
+    /// <exception cref="ArgumentOutOfRangeException">when we receive an unknown answer</exception>
     public void ApplyAnswerInfo((int X, int Y) guess, BattleAnswer answer)
     {
         Guesses.Add(guess);
@@ -87,6 +116,7 @@ public class Player
     private void MarkTilesAroundShipSegment((int X, int Y) guess)
     {
         var (x, y) = (guess.X, guess.Y);
+        // mark current coords with different value, to avoid infinite recursion
         GuessingBoard[x, y] = 3;
 
         foreach (var (i, j) in Constants.NeighborTilesRelativeCoords)
