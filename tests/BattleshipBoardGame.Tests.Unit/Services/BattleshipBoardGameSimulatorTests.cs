@@ -24,28 +24,35 @@ public class BattleshipBoardGameSimulatorTests
     }
 
     [Fact]
-    public async Task Create_ValidGuid_RunsNewSimulation()
+    public async Task Create_ValidGuid_PlayerAWins_RunsSimulation()
     {
         // Arrange
-        // use boardGenerator to create valid test data 
-        var boardGenerator = new BoardGenerator();
+        var shipOfA = (0, 0);
+        var shipOfB = (1, 1);
+        var shipSegmentsOfA = new List<ShipSegment> { new() { Coords = shipOfA, IsSunk = false } };
+        var shipSegmentsOfB = new List<ShipSegment> { new() { Coords = shipOfB, IsSunk = false } };
+        var shipsOfPlayerA = new List<Ship> { new(ShipType.Submarine, shipSegmentsOfA) };
+        var shipsOfPlayerB = new List<Ship> { new(ShipType.Submarine, shipSegmentsOfB) };
         var guid = Guid.NewGuid();
         var sim = new Simulation { Id = guid, IsFinished = false };
         var simulations = new List<Simulation> { sim };
         var tasksMock = simulations.AsQueryable().BuildMockDbSet();
 
-        _boardGenerator.Generate().Returns(boardGenerator.Generate(), boardGenerator.Generate());
+        _boardGenerator.GenerateShips().Returns(shipsOfPlayerA, shipsOfPlayerB);
+        _guessingEngine.Guess(Arg.Any<sbyte[,]>(), Arg.Any<GuessingStrategy>()).Returns(shipOfB, (9, 9));
         _dbContext.Simulations.Returns(tasksMock);
-
-        // todo: how to mock rounds? maybe introduce smh like Arbiter class?
+        _dbContext.Simulations.FindAsync(Arg.Is<Guid>(g => g == guid)).Returns(sim);
 
         // Act
         await _sut.Create(guid);
 
         // Assert
+        _boardGenerator.Received(2).GenerateShips();
+        _guessingEngine.Received(2).Guess(Arg.Any<sbyte[,]>(), Arg.Any<GuessingStrategy>());
         sim.Player1.Should().NotBeNull();
         sim.Player2.Should().NotBeNull();
-        _boardGenerator.Received(2).Generate();
+        sim.Winner.Should().NotBeNull();
+        sim.Winner!.Id.Should().Be(sim.Player1!.Id);
         _dbContext.Received(1).SaveChanges();
     }
 }

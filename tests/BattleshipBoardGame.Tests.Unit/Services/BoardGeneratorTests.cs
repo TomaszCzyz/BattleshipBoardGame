@@ -19,23 +19,6 @@ public class BoardGeneratorTests
     }
 
     [Fact]
-    public void Generate_StrategySimple_ReturnsValidBoard()
-    {
-        // Arrange
-        var strategy = ShipsPlacementStrategy.Simple;
-
-        // Act
-        var board = _sut.Generate(strategy);
-        _testOutputHelper.WriteLine(board.PrintToString());
-
-        // Assert
-        board.Should().BeOfType<sbyte[,]>();
-        board.EnumerateRows().Should().HaveCount(10);
-        // number of tiles with ships is equal to 5+4+3+2+2+1+1=18
-        board.EnumerateRows().SelectMany(bytes => bytes).Where(b => b == 1).Should().HaveCount(18);
-    }
-
-    [Fact]
     public void GenerateShips_StrategySimple_ReturnsValidShipsList()
     {
         // Arrange
@@ -47,8 +30,23 @@ public class BoardGeneratorTests
 
         // Assert
         ships.Should().HaveCount(7);
-        ships.SelectMany(ship => ship.Segments).Should().HaveCount(18);
-        // number of tiles with ships is equal to 5+4+3+2+2+1+1=18
+        ships.Where(ship => ship.Segments.Count == 1).Should().HaveCount(2);
+        ships.Where(ship => ship.Segments.Count == 2).Should().HaveCount(2);
+        ships.Where(ship => ship.Segments.Count == 3).Should().HaveCount(1);
+        ships.Where(ship => ship.Segments.Count == 4).Should().HaveCount(1);
+        ships.Where(ship => ship.Segments.Count == 5).Should().HaveCount(1);
+
+        var shipSegments = ships.SelectMany(ship => ship.Segments).ToArray();
+        var expectedNoOfSegments = 5 + 4 + 3 + 2 + 2 + 1 + 1;
+        shipSegments.Select(s => s.Coords).Distinct().Should().HaveCount(expectedNoOfSegments); // no overlapping segments
+        shipSegments.Should().HaveCount(expectedNoOfSegments);
+        shipSegments.Select(s => s.IsSunk).Should().AllSatisfy(b => b.Should().BeFalse());
+        shipSegments.Select(s => s.Coords).Should().AllSatisfy(
+            b =>
+            {
+                b.X.Should().BeInRange(0, Constants.BoardLength);
+                b.Y.Should().BeInRange(0, Constants.BoardLength);
+            });
     }
 
     private static string PrintShipsOnBoard(IEnumerable<Ship> ships)
