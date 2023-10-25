@@ -9,6 +9,7 @@ public interface ISimulationsDbContext
 {
     DbSet<Simulation> Simulations { get; }
     int SaveChanges();
+    Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }
 
 public class SimulationsDbContext : Microsoft.EntityFrameworkCore.DbContext, ISimulationsDbContext

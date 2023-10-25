@@ -35,13 +35,14 @@ await using (var db = scope.ServiceProvider.GetRequiredService<SimulationsDbCont
 }
 
 app.MapPost(
-    "/simulations/battleship/new/",
+    "/simulations/battleship/",
     async (ISimulationsDbContext dbContext, IBattleshipGameSimulator simulator, CancellationToken cancellationToken) =>
     {
         var id = Guid.NewGuid();
         await dbContext.Simulations.AddAsync(new Simulation { Id = id, IsFinished = false }, cancellationToken);
+        await dbContext.SaveChangesAsync(cancellationToken);
         _ = simulator.Create(id);
-        return id;
+        return id.ToString();
     });
 
 await app.RunAsync();
