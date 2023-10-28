@@ -10,18 +10,28 @@ function App() {
       <header className="App-header">
         Battleship board game simulator
       </header>
-      <div className="App-content">
-        <div>
-          <GridBoard/>
+      <div className="App-Content">
+        <div className="boards-grid">
+          <h3 className="player-header">Player 1</h3>
+          <div>
+            <p className="board-title">ships board</p>
+            <GridBoard/>
+          </div>
+          <div>
+            <p className="board-title">guessing board</p>
+            <GridBoard/>
+          </div>
+          <h3 className="player-header">Player 2</h3>
+          <div>
+            <p className="board-title">ships board</p>
+            <GridBoard/>
+          </div>
+          <div>
+            <p className="board-title">guessing board</p>
+            <GridBoard/>
+          </div>
         </div>
-        <div>
-          <GridBoard/>
-        </div>
-        <div>
-          <GridBoard/>
-        </div>
-        <div>
-          <GridBoard/>
+        <div className="sim-history">
         </div>
       </div>
     </div>

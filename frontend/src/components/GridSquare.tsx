@@ -1,8 +1,7 @@
 import React from "react";
+import {Tile} from "../models/tile";
 
 export default GridSquare;
-
-type Tile = "sea" | "ship"
 
 function GridSquare({tile}: { tile: Tile }) {
   const classes = `grid-square ${tile}-tile grid-row: 0`;
