@@ -10,7 +10,7 @@ function SimulationsMenu() {
     <div className="SimulationsMenu" >
       <fieldset>
         <legend>Menu</legend>
-        <fieldset className="SimulationsMenu-inner-fieldset" style={{display: "flex"}}>
+        <fieldset className="SimulationsMenu-inner-fieldset">
           <legend>Select existing</legend>
           <select placeholder="select simulation">
             {simulations.map((sim) => <option key={sim} value={sim}>{sim}</option>)}
