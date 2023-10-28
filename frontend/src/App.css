@@ -29,47 +29,16 @@
   --border-width: 4px;
 }
 
+* {
+  box-sizing: border-box;
+}
+
 body {
   background-image: url("../assets/background_graphic_256x256_cropped_filterB&W.jpeg");
   background-repeat: repeat;
   /*todo: maybe use opacity instead of blend-mode*/
   background-blend-mode: screen;
   background-color: rgba(224, 224, 224, 0.9);
-}
-
-.App {
-  text-align: center;
-  /*background-color: var(--bg-color);*/
-}
-
-.App-Content {
-  display: flex;
-  flex-wrap: wrap;
-}
-
-.boards-grid {
-  display: grid;
-  grid-template-columns: fit-content(50%) fit-content(50%);
-  grid-template-rows: auto auto auto auto;
-  justify-content: center;
-  place-items: center;
-  gap: 10px;
-}
-
-.App-header {
-  min-height: 100vh;
-  display: inline;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(15px + 2vmin);
-  font-weight: bold;
-}
-
-.player-header {
-  grid-row: auto;
-  grid-column: span 2;
-  margin-bottom: 0;
 }
 
 .sea-tile {
@@ -84,27 +53,56 @@ body {
   background-color: var(--color-0);
 }
 
-* {
-  box-sizing: border-box;
+.App {
+  text-align: center;
+  /*background-color: var(--bg-color);*/
 }
 
-.board-title {
+.App-Content {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.App-header {
+  min-height: 100vh;
+  display: inline;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(15px + 2vmin);
+  font-weight: bold;
+}
+
+.PlayerBoards-Content {
+  display: grid;
+  grid-template-columns: fit-content(50%) fit-content(50%);
+  gap: 10px;
+}
+
+.PlayerBoards-header {
+  grid-row: auto;
+  grid-column: span 2;
+  margin-bottom: 0;
+}
+
+.PlayerBoards-title {
   font-size: 0.8em;
   margin: 0;
 }
 
-.grid-board {
+.GridBoard {
   display: grid;
   grid-template-columns: repeat(var(--cols), var(--tile-size));
   grid-gap: 0;
   align-self: center;
 }
 
-.grid-square:hover {
+.GridSquare:hover {
   opacity: 0.7;
 }
 
-.grid-square {
+.GridSquare {
   border-style: solid;
   width: var(--tile-size);
   height: var(--tile-size);

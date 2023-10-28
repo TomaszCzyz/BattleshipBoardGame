@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.css';
-import GridBoard from "./components/GridBoard";
+import PlayerBoards from "./components/PlayerBoards";
 
 export default App
 
@@ -11,25 +11,9 @@ function App() {
         Battleship board game simulator
       </header>
       <div className="App-Content">
-        <div className="boards-grid">
-          <h3 className="player-header">Player 1</h3>
-          <div>
-            <p className="board-title">ships board</p>
-            <GridBoard/>
-          </div>
-          <div>
-            <p className="board-title">guessing board</p>
-            <GridBoard/>
-          </div>
-          <h3 className="player-header">Player 2</h3>
-          <div>
-            <p className="board-title">ships board</p>
-            <GridBoard/>
-          </div>
-          <div>
-            <p className="board-title">guessing board</p>
-            <GridBoard/>
-          </div>
+        <div className="App-Boards">
+          <PlayerBoards playerName={"A"}/>
+          <PlayerBoards playerName={"B"}/>
         </div>
         <div className="sim-history">
         </div>

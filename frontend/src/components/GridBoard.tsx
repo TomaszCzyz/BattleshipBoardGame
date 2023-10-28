@@ -13,7 +13,7 @@ function GridBoard() {
   }
   
   return (
-    <div className='grid-board'>
+    <div className='GridBoard'>
       {grid}
     </div>
   )

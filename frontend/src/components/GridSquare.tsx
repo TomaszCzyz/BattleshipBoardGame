@@ -4,6 +4,6 @@ import {Tile} from "../models/tile";
 export default GridSquare;
 
 function GridSquare({tile}: { tile: Tile }) {
-  const classes = `grid-square ${tile}-tile grid-row: 0`;
+  const classes = `GridSquare ${tile}-tile`;
   return <div className={classes}></div>;
 }
