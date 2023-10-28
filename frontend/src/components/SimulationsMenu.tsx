@@ -7,7 +7,7 @@ function SimulationsMenu() {
   const simulations: string[] = ["sim#1", "sim#2", "sim_with_custom_name"];
 
   return (
-    <div>
+    <div className="SimulationsMenu" >
       <fieldset>
         <legend>Menu</legend>
         <fieldset className="SimulationsMenu-inner-fieldset" style={{display: "flex"}}>

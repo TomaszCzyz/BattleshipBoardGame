@@ -91,6 +91,10 @@ fieldset > legend {
   font-weight: bold;
 }
 
+.SimulationsMenu {
+  background-color: #ffffff66;
+}
+
 .SimulationsMenu-inner-fieldset {
   display: flex;
   justify-content: space-between;
