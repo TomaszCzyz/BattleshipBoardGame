@@ -41,6 +41,20 @@ body {
   background-color: rgba(224, 224, 224, 0.9);
 }
 
+fieldset {
+  border: 2px solid #666;
+  border-radius: 6px;
+  text-align: left;
+}
+
+fieldset > legend {
+  margin-right: auto;
+}
+
+.medium-text {
+  font-size: 0.7em;
+}
+
 .sea-tile {
   background-color: var(--color-3);
 }
@@ -72,6 +86,16 @@ body {
   justify-content: center;
   font-size: calc(15px + 2vmin);
   font-weight: bold;
+}
+
+.SimulationsMenu-inner-fieldset {
+  display: flex;
+  justify-content: space-between;
+}
+
+.SimulationsMenu-button {
+  align-self: center;
+  height: fit-content;
 }
 
 .PlayerBoards-Content {
