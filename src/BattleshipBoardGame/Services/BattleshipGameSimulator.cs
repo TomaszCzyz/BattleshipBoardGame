@@ -36,9 +36,9 @@ public class BattleshipGameSimulator : IBattleshipGameSimulator
     ///     by cancelling long running simulations or by allowing only given number of simulations running
     ///     at the same time.
     /// </remarks>
-    public async Task Create(Guid id)
+    public async Task Run(Simulation simulation)
     {
-        _logger.LogInformation("Starting new simulation with id {SimulationId}", id);
+        _logger.LogInformation("Starting new simulation with id {SimulationId}", simulation.Id);
 
         // todo: get player's settings from POST's body
         var playerInfo1 = new PlayerInfo
@@ -56,11 +56,11 @@ public class BattleshipGameSimulator : IBattleshipGameSimulator
 
         var (player1, player2) = CreatePlayers(playerInfo1, playerInfo2);
 
-        var winner = RunSimulation(player1, player2);
+        var winner = await Task.Run(() => RunSimulation(player1, player2));
 
         var playerDto1 = new PlayerDto
         {
-            Id = id,
+            Id = Guid.NewGuid(),
             PlayerInfo = playerInfo1,
             Ships = player1.Ships.ToList(),
             Guesses = player1.Guesses.ToList()
@@ -68,14 +68,19 @@ public class BattleshipGameSimulator : IBattleshipGameSimulator
 
         var playerDto2 = new PlayerDto
         {
-            Id = id,
+            Id = Guid.NewGuid(),
             PlayerInfo = playerInfo2,
             Ships = player2.Ships.ToList(),
             Guesses = player2.Guesses.ToList()
         };
 
-        var winnerDto = player1 == winner ? playerDto1 : playerDto2;
-        await UpdateResults(id, playerDto1, playerDto2, winnerDto);
+        simulation.IsFinished = true;
+        simulation.Player1 = playerDto1;
+        simulation.Player2 = playerDto2;
+        simulation.Winner = player1 == winner ? playerDto1 : playerDto2;
+
+        _dbContext.Simulations.Add(simulation);
+        _dbContext.SaveChanges();
     }
 
     private (Player Player1, Player Player2) CreatePlayers(PlayerInfo playerInfo1, PlayerInfo playerInfo2)
@@ -121,31 +126,5 @@ public class BattleshipGameSimulator : IBattleshipGameSimulator
         guessingPlayer.ApplyAnswerInfo(guess, answer);
 
         return answer;
-    }
-
-    private async Task UpdateResults(Guid id, PlayerDto player1, PlayerDto player2, PlayerDto winner)
-    {
-        var simulation = await _dbContext.Simulations.FindAsync(id);
-        if (simulation is not null)
-        {
-            simulation.IsFinished = true;
-            simulation.Player1 = player1;
-            simulation.Player2 = player2;
-            simulation.Winner = winner;
-        }
-        else
-        {
-            await _dbContext.Simulations.AddAsync(
-                new Simulation
-                {
-                    Id = id,
-                    IsFinished = true,
-                    Player1 = player1,
-                    Player2 = player2,
-                    Winner = winner
-                });
-        }
-
-        _dbContext.SaveChanges();
     }
 }

@@ -1,6 +1,8 @@
-﻿namespace BattleshipBoardGame.Services;
+﻿using BattleshipBoardGame.Models.Entities;
+
+namespace BattleshipBoardGame.Services;
 
 public interface IBattleshipGameSimulator
 {
-    Task Create(Guid id);
+    Task Run(Simulation simulation);
 }

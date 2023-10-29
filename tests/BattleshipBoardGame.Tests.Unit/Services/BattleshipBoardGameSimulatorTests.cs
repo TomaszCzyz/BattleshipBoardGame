@@ -36,24 +36,22 @@ public class BattleshipBoardGameSimulatorTests
         var shipsOfPlayerB = new List<Ship> { new(ShipType.Submarine, shipSegmentsOfB) };
         var guid = Guid.NewGuid();
         var sim = new Simulation { Id = guid, IsFinished = false };
-        var simulations = new List<Simulation> { sim };
-        var tasksMock = simulations.AsQueryable().BuildMockDbSet();
 
         _boardGenerator.GenerateShips().Returns(shipsOfPlayerA, shipsOfPlayerB);
         _guessingEngine.Guess(Arg.Any<sbyte[,]>(), Arg.Any<GuessingStrategy>()).Returns(shipOfB, (9, 9));
-        _dbContext.Simulations.Returns(tasksMock);
-        _dbContext.Simulations.FindAsync(Arg.Is<Guid>(g => g == guid)).Returns(sim);
 
         // Act
-        await _sut.Create(guid);
+        await _sut.Run(sim);
 
         // Assert
-        _boardGenerator.Received(2).GenerateShips();
-        _guessingEngine.Received(2).Guess(Arg.Any<sbyte[,]>(), Arg.Any<GuessingStrategy>());
         sim.Player1.Should().NotBeNull();
         sim.Player2.Should().NotBeNull();
         sim.Winner.Should().NotBeNull();
         sim.Winner!.Id.Should().Be(sim.Player1!.Id);
+
+        _boardGenerator.Received(2).GenerateShips();
+        _guessingEngine.Received(2).Guess(Arg.Any<sbyte[,]>(), Arg.Any<GuessingStrategy>());
         _dbContext.Received(1).SaveChanges();
+        _dbContext.Simulations.Received(1).Add(Arg.Any<Simulation>());
     }
 }

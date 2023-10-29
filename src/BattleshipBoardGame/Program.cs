@@ -53,12 +53,13 @@ app.MapGet(
 
 app.MapPost(
     "/simulations/battleship/",
-    async (ISimulationsDbContext dbContext, IBattleshipGameSimulator simulator, CancellationToken cancellationToken) =>
+    async (IBattleshipGameSimulator simulator) =>
     {
         var id = Guid.NewGuid();
-        await dbContext.Simulations.AddAsync(new Simulation { Id = id, IsFinished = false }, cancellationToken);
-        await dbContext.SaveChangesAsync(cancellationToken);
-        _ = simulator.Create(id);
+        var simulation = new Simulation { Id = id, IsFinished = false };
+
+        await simulator.Run(simulation);
+
         return id.ToString();
     });
 
