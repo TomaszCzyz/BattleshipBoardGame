@@ -1,6 +1,6 @@
 using System.Diagnostics;
 
-namespace BattleshipBoardGame.Models;
+namespace BattleshipBoardGame.Models.Entities;
 
 [DebuggerDisplay("{Coords}")]
 public class ShipSegment

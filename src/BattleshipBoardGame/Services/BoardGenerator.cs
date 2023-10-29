@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using BattleshipBoardGame.Models;
+using BattleshipBoardGame.Models.Entities;
 
 namespace BattleshipBoardGame.Services;
 

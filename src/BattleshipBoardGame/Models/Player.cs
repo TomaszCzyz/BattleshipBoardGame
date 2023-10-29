@@ -1,4 +1,5 @@
 using BattleshipBoardGame.Helpers;
+using BattleshipBoardGame.Models.Entities;
 
 namespace BattleshipBoardGame.Models;
 

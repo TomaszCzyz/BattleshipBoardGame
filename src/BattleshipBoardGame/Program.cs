@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 using BattleshipBoardGame.DbContext;
-using BattleshipBoardGame.Models;
+using BattleshipBoardGame.Models.Entities;
 using BattleshipBoardGame.Services;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -33,6 +33,23 @@ await using (var db = scope.ServiceProvider.GetRequiredService<SimulationsDbCont
     app.Logger.LogInformation("Executing EF migrations...");
     db.Database.Migrate();
 }
+
+app.MapGet(
+    "/simulations/battleship/{id:guid?}",
+    async (ISimulationsDbContext dbContext, Guid? id) =>
+    {
+        if (id is not null)
+        {
+            var simulation = await dbContext.Simulations.FindAsync(id);
+            return simulation is null
+                ? Results.NotFound($"The simulation with id {id} has not been found")
+                : Results.Ok(simulation);
+        }
+
+        var sims = dbContext.Simulations.Select(s => s.Id);
+
+        return Results.Ok(sims);
+    });
 
 app.MapPost(
     "/simulations/battleship/",

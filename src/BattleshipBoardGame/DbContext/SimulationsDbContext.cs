@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using BattleshipBoardGame.Models;
+using BattleshipBoardGame.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 

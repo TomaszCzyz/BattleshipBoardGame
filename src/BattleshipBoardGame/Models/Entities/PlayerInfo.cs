@@ -1,6 +1,6 @@
 using BattleshipBoardGame.Services;
 
-namespace BattleshipBoardGame.Models;
+namespace BattleshipBoardGame.Models.Entities;
 
 /// <summary>
 ///     Basic information about player

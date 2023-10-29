@@ -1,5 +1,6 @@
 ﻿using BattleshipBoardGame.Extensions;
 using BattleshipBoardGame.Models;
+using BattleshipBoardGame.Models.Entities;
 using JetBrains.Annotations;
 
 namespace BattleshipBoardGame.Services;

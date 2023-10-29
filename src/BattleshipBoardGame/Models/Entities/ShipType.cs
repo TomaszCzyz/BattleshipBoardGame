@@ -1,4 +1,4 @@
-﻿namespace BattleshipBoardGame.Models;
+﻿namespace BattleshipBoardGame.Models.Entities;
 
 public enum ShipType
 {

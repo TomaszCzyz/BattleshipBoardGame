@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using BattleshipBoardGame.DbContext;
 using BattleshipBoardGame.Models;
+using BattleshipBoardGame.Models.Entities;
 using JetBrains.Annotations;
 
 namespace BattleshipBoardGame.Services;

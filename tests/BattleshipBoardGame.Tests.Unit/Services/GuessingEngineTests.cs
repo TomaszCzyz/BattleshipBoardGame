@@ -1,5 +1,6 @@
 ﻿using BattleshipBoardGame.Helpers;
 using BattleshipBoardGame.Models;
+using BattleshipBoardGame.Models.Entities;
 using BattleshipBoardGame.Services;
 using FluentAssertions;
 using Xunit;
