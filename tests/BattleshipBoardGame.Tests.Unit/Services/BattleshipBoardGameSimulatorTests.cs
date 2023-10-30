@@ -26,8 +26,8 @@ public class BattleshipBoardGameSimulatorTests
     public async Task Create_ValidGuid_PlayerAWins_RunsSimulation()
     {
         // Arrange
-        var shipOfA = (0, 0);
-        var shipOfB = (1, 1);
+        var shipOfA = new Point(0, 0);
+        var shipOfB = new Point(1, 1);
         var shipSegmentsOfA = new List<ShipSegment> { new() { Coords = shipOfA, IsSunk = false } };
         var shipSegmentsOfB = new List<ShipSegment> { new() { Coords = shipOfB, IsSunk = false } };
         var shipsOfPlayerA = new List<Ship> { new(ShipType.Submarine, shipSegmentsOfA) };
@@ -36,7 +36,7 @@ public class BattleshipBoardGameSimulatorTests
         var sim = new Simulation { Id = guid, IsFinished = false };
 
         _boardGenerator.GenerateShips().Returns(shipsOfPlayerA, shipsOfPlayerB);
-        _guessingEngine.Guess(Arg.Any<sbyte[,]>(), Arg.Any<GuessingStrategy>()).Returns(shipOfB, (9, 9));
+        _guessingEngine.Guess(Arg.Any<sbyte[,]>(), Arg.Any<GuessingStrategy>()).Returns(shipOfB, new Point(9, 9));
 
         // Act
         await _sut.Run(sim);

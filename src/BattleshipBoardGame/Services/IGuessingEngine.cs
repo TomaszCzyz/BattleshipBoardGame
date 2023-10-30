@@ -1,9 +1,8 @@
-﻿using BattleshipBoardGame.Models;
-using BattleshipBoardGame.Models.Entities;
+﻿using BattleshipBoardGame.Models.Entities;
 
 namespace BattleshipBoardGame.Services;
 
 public interface IGuessingEngine
 {
-    (int X, int Y) Guess(sbyte[,] guessingBoard, GuessingStrategy guessingStrategy);
+    Point Guess(sbyte[,] guessingBoard, GuessingStrategy guessingStrategy);
 }

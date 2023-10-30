@@ -45,8 +45,8 @@ public class BoardGeneratorTests
         shipSegments.Select(s => s.Coords).Should().AllSatisfy(
             b =>
             {
-                b.X.Should().BeInRange(0, Constants.BoardLength);
-                b.Y.Should().BeInRange(0, Constants.BoardLength);
+                b.Row.Should().BeInRange(0, Constants.BoardLength);
+                b.Col.Should().BeInRange(0, Constants.BoardLength);
             });
     }
 
@@ -60,7 +60,7 @@ public class BoardGeneratorTests
         {
             for (var j = 0; j < Constants.BoardLength; j++)
             {
-                sb.Append(coords.Contains((i, j)) ? '#' : '_');
+                sb.Append(coords.Contains(new Point(i, j)) ? '#' : '_');
             }
 
             sb.AppendLine();

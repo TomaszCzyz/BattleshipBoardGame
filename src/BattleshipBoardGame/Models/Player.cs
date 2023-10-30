@@ -32,7 +32,7 @@ public class Player
     /// <summary>
     ///     Guesses of the player in an order (first guess at the index 0)
     /// </summary>
-    public IList<(int, int)> Guesses { get; } = new List<(int, int)>();
+    public IList<Point> Guesses { get; } = new List<Point>();
 
     /// <summary>
     ///     Initializes a player with a given list of ships and a <see cref="GuessingBoard"/>
@@ -49,7 +49,7 @@ public class Player
     /// </summary>
     /// <param name="guess">Coordinates on the board</param>
     /// <param name="shipType">Type of a sunk ship or null</param>
-    public PlayerAnswer Answer((int X, int Y) guess, out ShipType? shipType)
+    public PlayerAnswer Answer(Point guess, out ShipType? shipType)
     {
         shipType = null;
         Ship? ship = null;
@@ -92,21 +92,21 @@ public class Player
     /// <param name="guess">a guess to which we have an answer</param>
     /// <param name="answer">the answer to our guess</param>
     /// <exception cref="ArgumentOutOfRangeException">when we receive an unknown answer</exception>
-    public void ApplyAnswerInfo((int X, int Y) guess, PlayerAnswer answer)
+    public void ApplyAnswerInfo(Point guess, PlayerAnswer answer)
     {
         Guesses.Add(guess);
 
         switch (answer)
         {
             case PlayerAnswer.Miss:
-                GuessingBoard[guess.X, guess.Y] = 0;
+                GuessingBoard[guess.Row, guess.Col] = 0;
                 break;
             case PlayerAnswer.HitAndWholeFleetSunk:
             case PlayerAnswer.HitNotSunk:
-                GuessingBoard[guess.X, guess.Y] = 1;
+                GuessingBoard[guess.Row, guess.Col] = 1;
                 break;
             case PlayerAnswer.HitAndSunk:
-                GuessingBoard[guess.X, guess.Y] = 1;
+                GuessingBoard[guess.Row, guess.Col] = 1;
                 MarkTilesAroundShipSegment(guess);
                 break;
             default:
@@ -114,9 +114,9 @@ public class Player
         }
     }
 
-    private void MarkTilesAroundShipSegment((int X, int Y) guess)
+    private void MarkTilesAroundShipSegment(Point guess)
     {
-        var (x, y) = (guess.X, guess.Y);
+        var (x, y) = (guess.Row, guess.Col);
         // mark current coords with different value, to avoid infinite recursion
         GuessingBoard[x, y] = 3;
 
@@ -131,7 +131,7 @@ public class Player
             var value = GuessingBoard[x + i, y + j];
             if (value == 1)
             {
-                MarkTilesAroundShipSegment((x + i, y + j));
+                MarkTilesAroundShipSegment(new Point(x + i, y + j));
             }
             else if (value == -1)
             {

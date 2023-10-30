@@ -1,5 +1,4 @@
 ﻿using BattleshipBoardGame.Helpers;
-using BattleshipBoardGame.Models;
 using BattleshipBoardGame.Models.Entities;
 using BattleshipBoardGame.Services;
 using FluentAssertions;
@@ -21,8 +20,8 @@ public class GuessingEngineTests
         var guess = _sut.Guess(board, GuessingStrategy.Random);
 
         // Assert
-        guess.X.Should().BeInRange(0, 10);
-        guess.Y.Should().BeInRange(0, 10);
+        guess.Row.Should().BeInRange(0, 10);
+        guess.Col.Should().BeInRange(0, 10);
     }
 
     [Fact]

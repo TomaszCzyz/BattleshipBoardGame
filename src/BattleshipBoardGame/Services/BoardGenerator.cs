@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using BattleshipBoardGame.Models;
 using BattleshipBoardGame.Models.Entities;
 
 namespace BattleshipBoardGame.Services;
@@ -96,7 +95,7 @@ public class BoardGenerator : IBoardGenerator
         {
             // check if there is a ship segment at this coordinates or coordinates adjacent to it.
             var forbiddenCoords = Constants.NeighborTilesRelativeCoords
-                .Select(relative => (coords.X + relative.I, coords.Y + relative.J))
+                .Select(relative => new Point(coords.Row + relative.Row, coords.Col + relative.Col))
                 .Append(coords)
                 .ToArray();
 
@@ -138,7 +137,7 @@ public class BoardGenerator : IBoardGenerator
                 return false;
             }
 
-            shipSegments.Add(new ShipSegment { Coords = (i, j), IsSunk = false });
+            shipSegments.Add(new ShipSegment { Coords = new Point(i, j), IsSunk = false });
         }
 
         ship = new Ship(shipType, shipSegments);

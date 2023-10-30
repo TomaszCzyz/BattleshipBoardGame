@@ -1,5 +1,4 @@
 ﻿using BattleshipBoardGame.Extensions;
-using BattleshipBoardGame.Models;
 using BattleshipBoardGame.Models.Entities;
 using JetBrains.Annotations;
 
@@ -22,21 +21,21 @@ public class GuessingEngine : IGuessingEngine
     ///     because there is no unknown point on the <paramref name="guessingBoard"/>,
     ///     <see cref="EnsureCanGuess"/>.
     /// </exception>
-    public (int X, int Y) Guess(sbyte[,] guessingBoard, GuessingStrategy guessingStrategy)
+    public Point Guess(sbyte[,] guessingBoard, GuessingStrategy guessingStrategy)
     {
         EnsureCanGuess(guessingBoard);
 
         return GuessInner(guessingBoard, guessingStrategy);
     }
 
-    private static (int X, int Y) GuessInner(sbyte[,] guessingBoard, GuessingStrategy guessingStrategy)
+    private static Point GuessInner(sbyte[,] guessingBoard, GuessingStrategy guessingStrategy)
         => guessingStrategy switch
         {
             GuessingStrategy.Random => GuessRandomly(guessingBoard),
             _ => throw new ArgumentOutOfRangeException(nameof(guessingStrategy), guessingStrategy, "Unknown guessing strategy")
         };
 
-    private static (int X, int Y) GuessRandomly(sbyte[,] guessingBoard)
+    private static Point GuessRandomly(sbyte[,] guessingBoard)
     {
         int x, y;
         do
@@ -45,7 +44,7 @@ public class GuessingEngine : IGuessingEngine
             y = Random.Shared.Next(guessingBoard.GetLength(1));
         } while (guessingBoard[x, y] != -1);
 
-        return (x, y);
+        return new Point(x, y);
     }
 
     /// <summary>

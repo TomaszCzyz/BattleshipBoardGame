@@ -1,9 +1,11 @@
-﻿namespace BattleshipBoardGame;
+﻿using BattleshipBoardGame.Models.Entities;
+
+namespace BattleshipBoardGame;
 
 public class Constants
 {
-    public static readonly (int I, int J)[] NeighborTilesRelativeCoords
-        = { (-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1), (0, -1), (-1, -1) };
+    public static readonly Point[] NeighborTilesRelativeCoords
+        = { new(-1, 0), new(-1, 1), new(0, 1), new(1, 1), new(1, 0), new(1, -1), new(0, -1), new(-1, -1) };
 
     public const int BoardLength = 10;
 

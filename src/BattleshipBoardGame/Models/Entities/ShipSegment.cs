@@ -5,7 +5,7 @@ namespace BattleshipBoardGame.Models.Entities;
 [DebuggerDisplay("{Coords}")]
 public class ShipSegment
 {
-    public (int X, int Y) Coords { get; init; }
+    public Point Coords { get; init; }
 
     public bool IsSunk { get; set; }
 }
