@@ -6,4 +6,6 @@ public class Constants
         = { (-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1), (0, -1), (-1, -1) };
 
     public const int BoardLength = 10;
+
+    public const string AllowedSpecificOrigins = "AllowedSpecificOrigins";
 }

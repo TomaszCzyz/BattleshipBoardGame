@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using BattleshipBoardGame;
 using BattleshipBoardGame.DbContext;
 using BattleshipBoardGame.Models.Entities;
 using BattleshipBoardGame.Services;
@@ -23,6 +24,8 @@ builder.Services.AddDbContext<ISimulationsDbContext, SimulationsDbContext>(optio
     => options
         .UseSqlite($"Data Source={Path.Join(Path.GetTempPath(), "simulations.db")}")
         .UseLoggerFactory(new SerilogLoggerFactory()));
+builder.Services.AddCors(options
+    => options.AddPolicy(Constants.AllowedSpecificOrigins, policy => policy.WithOrigins("http://localhost:3000")));
 
 var app = builder.Build();
 app.Logger.LogInformation("Application created. Launching application...");
@@ -40,7 +43,12 @@ app.MapGet(
     {
         if (id is not null)
         {
-            var simulation = await dbContext.Simulations.FindAsync(id);
+            var simulation = await dbContext.Simulations
+                .Include(simulation1 => simulation1.Player1)
+                .Include(simulation1 => simulation1.Player2)
+                .Include(simulation1 => simulation1.Winner)
+                .FirstOrDefaultAsync(s => s.Id == id);
+
             return simulation is null
                 ? Results.NotFound($"The simulation with id {id} has not been found")
                 : Results.Ok(simulation);
@@ -62,6 +70,8 @@ app.MapPost(
 
         return id.ToString();
     });
+
+app.UseCors(Constants.AllowedSpecificOrigins);
 
 await app.RunAsync();
 
