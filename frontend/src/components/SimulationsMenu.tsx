@@ -54,7 +54,7 @@ function SimulationsMenu() {
     const id = simulationNames[selectedSimIndex];
     fetch(`http://localhost:5000/simulations/battleship/${id}`)
       .then(response => response.json() as Promise<Simulation>)
-      .catch((error) => console.error(error));
+      .catch(error => console.error(error));
   };
 
   return (
@@ -71,7 +71,7 @@ function SimulationsMenu() {
         </fieldset>
         <fieldset className="SimulationsMenu-inner-fieldset">
           <legend>Run new</legend>
-          <div style={{display: "flex", flexWrap: "wrap"}}>
+          <div className="SimulationsMenu-player-settings">
             <PlayerSettings name={"1"}/>
             <PlayerSettings name={"2"}/>
           </div>
