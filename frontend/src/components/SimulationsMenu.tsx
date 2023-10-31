@@ -2,40 +2,11 @@ import React, {useEffect, useState} from "react";
 
 export default SimulationsMenu;
 
-type Simulation = {
-  id: number;
-  Player1: Player;
-  Player2: Player;
-  Winner: Player;
-};
-
-type PlayerInfo = {
-  guessingStrategy: string;
-  shipsPlacementStrategy: string;
+interface SimulationsMenuProps {
+  onSimLoadClick: (id: string) => void;
 }
 
-interface Point {
-  row: number;
-  col: number;
-}
-
-type ShipSegment = {
-  isSunk: boolean;
-  coords: Point
-}
-
-type Ship = {
-  segments: ShipSegment[]
-}
-
-type Player = {
-  id: string;
-  playerInfo: PlayerInfo;
-  guesses: Point[];
-  ships: Ship[];
-};
-
-function SimulationsMenu() {
+function SimulationsMenu({simulationsMenuProps}: { simulationsMenuProps: SimulationsMenuProps }) {
   const [simulationNames, setSimulationNames] = useState<string[]>([]);
   let selectedSimIndex = 0;
 
@@ -46,16 +17,12 @@ function SimulationsMenu() {
       .catch((error) => console.error(error));
   }, []);
 
-  const handleLoadSim = () => {
-    if (selectedSimIndex < 0) {
-      console.error(new Error("Simulation index is not valid"));
-      return;
+  const handleClick = (_: React.MouseEvent<HTMLButtonElement>) => {
+    if (selectedSimIndex >= simulationNames.length) {
+      return new Error("no valid sim selected");
     }
-    const id = simulationNames[selectedSimIndex];
-    fetch(`http://localhost:5000/simulations/battleship/${id}`)
-      .then(response => response.json() as Promise<Simulation>)
-      .catch(error => console.error(error));
-  };
+    simulationsMenuProps.onSimLoadClick(simulationNames[selectedSimIndex]);
+  }
 
   return (
     <div className="SimulationsMenu">
@@ -67,7 +34,7 @@ function SimulationsMenu() {
             <option value="placeholder" disabled>Select sim</option>
             {simulationNames.map((sim) => <option key={sim} value={sim}>{sim}</option>)}
           </select>
-          <button className="SimulationsMenu-button" onClick={handleLoadSim}>Load</button>
+          <button className="SimulationsMenu-button" onClick={handleClick}>Load</button>
         </fieldset>
         <fieldset className="SimulationsMenu-inner-fieldset">
           <legend>Run new</legend>
