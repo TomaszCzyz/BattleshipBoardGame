@@ -25,19 +25,21 @@ function App() {
   const [simulation, setSimulation] = useState<Simulation | null>(null);
   const [boards, setBoards] = useState<Boards>(initialBoards);
 
-  const loadRound = (roundNumber: number) => {
-    if (simulation === null || roundNumber < 0 || roundNumber >= simulation.player1.guesses.length) {
+  const loadRound = (roundNumber: number, sim: Simulation) => {
+    if (sim === null || roundNumber < 0 || roundNumber >= sim.player1.guesses.length) {
       return;
     }
-    const newBoards = getBoards(roundNumber, simulation);
+    const newBoards = getBoards(roundNumber, sim);
     setBoards(newBoards);
   }
 
   const handleLoadSim = (simId: string) => {
     fetch(`http://localhost:5000/simulations/battleship/${simId}`)
       .then(response => response.json() as Promise<Simulation>)
-      .then(sim => setSimulation(sim))
-      .then(_ => loadRound(0))
+      .then(sim => {
+        setSimulation(sim);
+        loadRound(0, sim);
+      })
       .catch(error => console.error(error));
   };
 
@@ -87,7 +89,7 @@ function App() {
                 .map((guess1, i) => [guess1, simulation?.player2.guesses[i]])
                 .map(([g1, g2], i) =>
                   <li key={i}>
-                    <button onClick={_ => loadRound(i)}>
+                    <button onClick={_ => loadRound(i, simulation)}>
                       P1 guessed: ({g1.row},{g1.col})
                       <br/>
                       P2 guessed: ({g2.row},{g2.col})
