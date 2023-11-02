@@ -24,10 +24,9 @@ function App() {
 
   const [simulation, setSimulation] = useState<Simulation | null>(null);
   const [boards, setBoards] = useState<Boards>(initialBoards);
-  const [history, setHistory] = useState<string[]>([])
 
   const loadRound = (roundNumber: number) => {
-    if (simulation === null || roundNumber < 0 || roundNumber >= history.length) {
+    if (simulation === null || roundNumber < 0 || roundNumber >= simulation.player1.guesses.length) {
       return;
     }
     const newBoards = getBoards(roundNumber, simulation);
@@ -37,11 +36,7 @@ function App() {
   const handleLoadSim = (simId: string) => {
     fetch(`http://localhost:5000/simulations/battleship/${simId}`)
       .then(response => response.json() as Promise<Simulation>)
-      .then(sim => {
-        const newGuesses = createGuesses(sim);
-        setHistory(newGuesses)
-        setSimulation(sim);
-      })
+      .then(sim => setSimulation(sim))
       .then(_ => loadRound(0))
       .catch(error => console.error(error));
   };
@@ -88,24 +83,23 @@ function App() {
           </div>
           <ol style={{height: "50px"}}>
             {
-              history.map((guess, i) =>
-                <li key={i}>
-                  <button>{guess}</button>
-                </li>)
+              simulation?.player1.guesses
+                .map((guess1, i) => [guess1, simulation?.player2.guesses[i]])
+                .map(([g1, g2], i) =>
+                  <li key={i}>
+                    <button onClick={_ => loadRound(i)}>
+                      P1 guessed: ({g1.row},{g1.col})
+                      <br/>
+                      P2 guessed: ({g2.row},{g2.col})
+                    </button>
+                  </li>
+                )
             }
           </ol>
         </div>
       </div>
     </div>
   );
-}
-
-const createGuesses = (sim: Simulation): string[] => {
-  let guesses1 = sim.player1.guesses.map(guess => `P1 guessed: (${guess.row},${guess.col})`);
-  let guesses2 = sim.player2.guesses.map(guess => `P2 guessed: (${guess.row},${guess.col})`);
-  return guesses1
-    .map((e, i) => [e, guesses2[i]])
-    .flatMap(guessesInRound => guessesInRound);
 }
 
 const getBoards = (roundNumber: number, sim: Simulation): Boards => {
