@@ -10,6 +10,8 @@ interface SimulationsMenuProps {
 
 function SimulationsMenu({simulationsMenuProps}: { simulationsMenuProps: SimulationsMenuProps }) {
   const [simulationNames, setSimulationNames] = useState<string[]>([]);
+  // marker to trigger simulation list reloading when new simulation has been run
+  const [newSimMarker, setNewSimMarker] = useState(true);
   let playerInfo1: PlayerInfo = {
     name: "1",
     guessingStrategy: "random",
@@ -27,7 +29,7 @@ function SimulationsMenu({simulationsMenuProps}: { simulationsMenuProps: Simulat
       .then(response => response.json())
       .then(data => setSimulationNames(data))
       .catch(error => console.error(error));
-  }, []);
+  }, [newSimMarker]);
 
   const handleLoadSimClick = (_: React.MouseEvent<HTMLButtonElement>) => {
     if (selectedSimIndex >= simulationNames.length) {
@@ -36,10 +38,10 @@ function SimulationsMenu({simulationsMenuProps}: { simulationsMenuProps: Simulat
     simulationsMenuProps.onSimLoadClick(simulationNames[selectedSimIndex]);
   }
 
-  function handleRunSimClick() {
-    console.log(`handleRunSimClick: P1: ${playerInfo1.guessingStrategy}   P2: ${playerInfo2.guessingStrategy}`)
-    simulationsMenuProps.onSimRunClick(playerInfo1, playerInfo2);
-  }
+  const handleRunSimClick = () => {
+    setNewSimMarker(!newSimMarker);
+    simulationsMenuProps.onSimRunClick(playerInfo1, playerInfo2)
+  };
 
   return (
     <div className="SimulationsMenu">
