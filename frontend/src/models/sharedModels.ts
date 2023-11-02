@@ -1,3 +1,10 @@
+export type Tile = "unknown" | "sea" | "ship" | "hit" | "miss"
+
+export interface Point {
+  row: number;
+  col: number;
+}
+
 export type Simulation = {
   id: string;
   player1: Player;
@@ -11,10 +18,12 @@ export type PlayerInfo = {
   shipsPlacementStrategy: string;
 }
 
-export interface Point {
-  row: number;
-  col: number;
-}
+export type Player = {
+  id: string;
+  playerInfo: PlayerInfo;
+  guesses: Point[];
+  ships: Ship[];
+};
 
 type ShipSegment = {
   isSunk: boolean;
@@ -24,10 +33,3 @@ type ShipSegment = {
 type Ship = {
   segments: ShipSegment[]
 }
-
-type Player = {
-  id: string;
-  playerInfo: PlayerInfo;
-  guesses: Point[];
-  ships: Ship[];
-};

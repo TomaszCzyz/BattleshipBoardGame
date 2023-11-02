@@ -1,5 +1,5 @@
 import React from "react";
-import {Tile} from "../models/tile";
+import {Tile} from "../models/sharedModels";
 
 export default GridSquare;
 

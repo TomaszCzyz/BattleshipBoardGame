@@ -1,7 +1,7 @@
 import React from 'react';
 import GridBoard from "./GridBoard";
 import GridSquare from "./GridSquare";
-import {Tile} from "../models/tile";
+import {Tile} from "../models/sharedModels";
 
 export default PlayerBoards;
 
