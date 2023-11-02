@@ -1,16 +1,17 @@
 export type Simulation = {
-  id: number;
+  id: string;
   player1: Player;
   player2: Player;
   Winner: Player;
 };
 
-type PlayerInfo = {
+export type PlayerInfo = {
+  name: string,
   guessingStrategy: string;
   shipsPlacementStrategy: string;
 }
 
-interface Point {
+export interface Point {
   row: number;
   col: number;
 }

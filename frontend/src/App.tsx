@@ -3,7 +3,7 @@ import './App.css';
 import PlayerBoards from "./components/PlayerBoards";
 import {Tile} from "./models/tile";
 import SimulationsMenu from "./components/SimulationsMenu";
-import {Simulation} from "./models/sharedModels";
+import {PlayerInfo, Simulation} from "./models/sharedModels";
 import NextGuessImage from './assets/icons8-forward-100.png';
 import PrevGuessImage from './assets/icons8-back-100.png';
 import DoubleNextGuessImage from './assets/icons8-double-right-100.png';
@@ -13,7 +13,7 @@ import FastForwardImage from './assets/icons8-fast-forward-100.png';
 export default App
 
 function App() {
-  // let ownBoardA: Tile[][] = initialize2DArray(10, "sea");
+  const [simulationId, setSimulationId] = useState("");
   const initialHist: string[] = [];
   const [history, setHistory] = useState(initialHist)
 
@@ -42,22 +42,46 @@ function App() {
 
         setHistory(createSimHistory(sim))
         setOwnBoardA(array);
+        setSimulationId(sim.id);
       })
       .catch(error => console.error(error));
   };
+
+  const handleRunSim = (playerInfo1: PlayerInfo, playerInfo2: PlayerInfo) => {
+    const runNewSim = async () => {
+      console.log(JSON.stringify({playerInfo1: playerInfo1, playerInfo2: playerInfo2}));
+      return await fetch(
+        `http://localhost:5000/simulations/battleship/`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify([playerInfo1, playerInfo2]),
+        })
+        .then(sim => sim.json())
+        .catch(error => console.error(error))
+    };
+
+    runNewSim().then(simId => {
+      if (simId) {
+        handleLoadSim(simId)
+      }
+    });
+  };
+
   return (
     <div className="App">
       <header className="App-header">
         Battleship board game simulator
       </header>
-      <SimulationsMenu simulationsMenuProps={{onSimLoadClick: handleLoadSim}}/>
+      <SimulationsMenu simulationsMenuProps={{onSimLoadClick: handleLoadSim, onSimRunClick: handleRunSim}}/>
       <div className="App-Content">
         <div className="App-Boards">
           <PlayerBoards playerName={"A"} ownBoard={ownBoardA} guessingBoard={guessingBoardA}/>
           <PlayerBoards playerName={"B"} ownBoard={ownBoardB} guessingBoard={guessingBoardB}/>
         </div>
         <div className="App-sim-history medium-text">
-          <h4>Simulation history:</h4>
+          <h4>Simulation {simulationId.substring(0, 4)}(...) history:</h4>
           <div className="App-sim-hist">
             <button><img src={DoublePrevGuessImage} alt="backward 10 guesses"/></button>
             <button><img src={PrevGuessImage} alt="previous guess"/></button>
