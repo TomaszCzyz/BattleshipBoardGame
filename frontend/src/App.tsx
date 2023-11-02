@@ -19,14 +19,15 @@ type Boards = {
 }
 
 function App() {
-  const emptyBoard = initialize2DArray(10, "sea")
-  const initialBoards: Boards = {ownA: emptyBoard, ownB: emptyBoard, guessingA: emptyBoard, guessingB: emptyBoard};
+  const emptySeaBoard = initialize2DArray(10, "sea")
+  const emptyUnknownBoard = initialize2DArray(10, "unknown")
+  const initialBoards: Boards = {ownA: emptySeaBoard, ownB: emptySeaBoard, guessingA: emptyUnknownBoard, guessingB: emptyUnknownBoard};
 
   const [simulation, setSimulation] = useState<Simulation | null>(null);
   const [boards, setBoards] = useState<Boards>(initialBoards);
 
   const loadRound = (roundNumber: number, sim: Simulation) => {
-    if (sim === null || roundNumber < 0 || roundNumber >= sim.player1.guesses.length) {
+    if (sim === null || roundNumber < 0 || roundNumber > sim.player1.guesses.length) {
       return;
     }
     const newBoards = getBoards(roundNumber, sim);
@@ -89,7 +90,7 @@ function App() {
                 .map((guess1, i) => [guess1, simulation?.player2.guesses[i]])
                 .map(([g1, g2], i) =>
                   <li key={i}>
-                    <button onClick={_ => loadRound(i, simulation)}>
+                    <button onClick={_ => loadRound(i + 1, simulation)}>
                       P1 guessed: ({g1.row},{g1.col})
                       <br/>
                       P2 guessed: ({g2.row},{g2.col})
@@ -107,8 +108,8 @@ function App() {
 const getBoards = (roundNumber: number, sim: Simulation): Boards => {
   const ownA = initialize2DArray(10, "sea");
   const ownB = initialize2DArray(10, "sea");
-  const guessingA = initialize2DArray(10, "sea");
-  const guessingB = initialize2DArray(10, "sea");
+  const guessingA = initialize2DArray(10, "unknown");
+  const guessingB = initialize2DArray(10, "unknown");
 
   const shipCoordsA = sim.player1.ships.flatMap(s => s.segments.map(v => v.coords));
   const shipCoordsB = sim.player2.ships.flatMap(s => s.segments.map(v => v.coords));
@@ -121,8 +122,8 @@ const getBoards = (roundNumber: number, sim: Simulation): Boards => {
   shipCoordsB.forEach(p => ownB[p.row][p.col] = "ship");
 
   // draw guesses
-  guessesA.forEach(p => guessingA[p.row][p.col] = "miss");
-  guessesB.forEach(p => guessingB[p.row][p.col] = "miss");
+  guessesA.forEach(p => guessingA[p.row][p.col] = "hit-sea");
+  guessesB.forEach(p => guessingB[p.row][p.col] = "hit-sea");
 
   // mark hit ships
   guessesA

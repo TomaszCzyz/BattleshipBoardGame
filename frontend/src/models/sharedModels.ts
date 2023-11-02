@@ -1,4 +1,4 @@
-export type Tile = "unknown" | "sea" | "ship" | "hit" | "miss"
+export type Tile = "unknown" | "sea" | "ship" | "hit" | "miss" | "hit-sea"
 
 export interface Point {
   row: number;

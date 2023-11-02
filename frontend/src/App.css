@@ -12,7 +12,7 @@
   --color-1: #ff6600;
   --color-2: #eec900;
   --color-3: #002aff;
-  --color-4: #cc00ff;
+  --color-4: #00b2ff;
   --color-5: #00ff00;
   --color-6: #66ccff;
   --color-7: #ff0000;
@@ -59,12 +59,16 @@ fieldset > legend {
   background-color: var(--color-3);
 }
 
+.hit-sea-tile {
+  background-color: var(--color-4);
+}
+
 .ship-tile {
   background-color: var(--color-1);
 }
 
 .miss-tile {
-  background-color: var(--color-4);
+  background-color: var(--color-2);
 }
 
 .unknown-tile {
