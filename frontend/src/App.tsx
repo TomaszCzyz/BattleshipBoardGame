@@ -25,13 +25,22 @@ function App() {
 
   const [simulation, setSimulation] = useState<Simulation | null>(null);
   const [boards, setBoards] = useState<Boards>(initialBoards);
+  const [roundNumber, setRoundNumber] = useState(0);
 
-  const loadRound = (roundNumber: number, sim: Simulation) => {
-    if (sim === null || roundNumber < 0 || roundNumber > sim.player1.guesses.length) {
+  const loadRound = (roundNum: number, sim: Simulation | null) => {
+    if (sim === null) {
       return;
     }
-    const newBoards = getBoards(roundNumber, sim);
+    if (roundNum < 0) {
+      roundNum = 0;
+    }
+    if (roundNum > sim.player1.guesses.length) {
+      roundNum = sim.player1.guesses.length;
+    }
+
+    const newBoards = getBoards(roundNum, sim);
     setBoards(newBoards);
+    setRoundNumber(roundNum);
   }
 
   const handleLoadSim = (simId: string) => {
@@ -78,11 +87,36 @@ function App() {
         <div className="App-sim-history medium-text">
           <h4>Simulation {simulation?.id.substring(0, 4)}(...) history:</h4>
           <div className="App-sim-hist">
-            <button><img src={DoublePrevGuessImage} alt="backward 10 guesses"/></button>
-            <button><img src={PrevGuessImage} alt="previous guess"/></button>
-            <button><img src={NextGuessImage} alt="next guess"/></button>
-            <button><img src={DoubleNextGuessImage} alt="forward 10 guesses"/></button>
-            <button><img src={FastForwardImage} alt="forward to the end"/></button>
+            <button>
+              <img
+                src={DoublePrevGuessImage}
+                onClick={_ => loadRound(roundNumber - 10, simulation)}
+                alt="backward 10 guesses"/>
+            </button>
+            <button>
+              <img
+                src={PrevGuessImage}
+                onClick={_ => loadRound(roundNumber - 1, simulation)}
+                alt="previous guess"/>
+            </button>
+            <button>
+              <img
+                src={NextGuessImage}
+                onClick={_ => loadRound(roundNumber + 1, simulation)}
+                alt="next guess"/>
+            </button>
+            <button>
+              <img
+                src={DoubleNextGuessImage}
+                onClick={_ => loadRound(roundNumber + 10, simulation)}
+                alt="forward 10 guesses"/>
+            </button>
+            <button>
+              <img
+                src={FastForwardImage}
+                onClick={_ => loadRound(Number.MAX_VALUE, simulation)}
+                alt="forward to the end"/>
+            </button>
           </div>
           <ol style={{height: "50px"}}>
             {
