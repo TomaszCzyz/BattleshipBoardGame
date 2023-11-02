@@ -1,7 +1,7 @@
 export type Simulation = {
   id: number;
   player1: Player;
-  Player2: Player;
+  player2: Player;
   Winner: Player;
 };
 
