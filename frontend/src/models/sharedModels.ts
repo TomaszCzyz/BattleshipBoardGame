@@ -9,7 +9,7 @@ export type Simulation = {
   id: string;
   player1: Player;
   player2: Player;
-  Winner: Player;
+  Winner: string;
 };
 
 export type PlayerInfo = {
