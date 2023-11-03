@@ -7,11 +7,12 @@ using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Xunit;
 
 namespace BattleshipBoardGame.Tests.Integration;
 
 [UsedImplicitly]
-public class CustomWebApplicationFactory<TProgram> : WebApplicationFactory<TProgram> where TProgram : class
+public class CustomWebApplicationFactory<TProgram> : WebApplicationFactory<TProgram>, IAsyncLifetime where TProgram : class
 {
     protected override void ConfigureWebHost(IWebHostBuilder builder)
         => builder
@@ -41,4 +42,25 @@ public class CustomWebApplicationFactory<TProgram> : WebApplicationFactory<TProg
                     options.UseSqlite(connection);
                 });
             });
+    
+    public async Task InitializeAsync()
+    {
+        var serviceScope = Services.CreateScope();
+        var dbContext = serviceScope.ServiceProvider.GetRequiredService<SimulationsDbContext>();
+        var connection = serviceScope.ServiceProvider.GetRequiredService<DbConnection>();
+
+        // Because for integration tests I use Singleton connection, which is opened for the entire ClassFixture lifetime,
+        // I have to temporarily close connection to re-create db (release file lock).
+        await connection.CloseAsync();
+
+        await dbContext.Database.EnsureDeletedAsync();
+        await dbContext.Database.EnsureCreatedAsync();
+
+        await connection.OpenAsync();
+    }
+
+    public new async Task DisposeAsync()
+    {
+        await base.DisposeAsync();
+    }
 }

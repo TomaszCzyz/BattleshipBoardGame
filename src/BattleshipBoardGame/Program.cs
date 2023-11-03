@@ -40,8 +40,8 @@ app.Logger.LogInformation("Application created. Launching application...");
 using var scope = app.Services.CreateScope();
 await using (var db = scope.ServiceProvider.GetRequiredService<SimulationsDbContext>())
 {
-    app.Logger.LogInformation("Executing EF migrations...");
-    db.Database.Migrate();
+    app.Logger.LogInformation("Ensuring that db exists...");
+    db.Database.EnsureCreated();
 }
 
 app.MapGet(
@@ -87,7 +87,7 @@ app.MapPost(
 
         await simulator.Run(simulation, playerInfo1, playerInfo2, cancellationToken);
 
-        return Results.Ok(id.ToString());
+        return Results.Text(id.ToString());
     });
 
 app.UseCors(Constants.AllowedSpecificOrigins);
