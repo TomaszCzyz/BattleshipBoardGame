@@ -27,4 +27,6 @@ public struct Point : IEquatable<Point>
         row = Row;
         col = Col;
     }
+
+    public override string ToString() => $"({nameof(Row)}: {Row}, {nameof(Col)}: {Col})";
 }

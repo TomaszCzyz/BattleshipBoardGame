@@ -36,27 +36,12 @@ public class BattleshipGameSimulator : IBattleshipGameSimulator
     ///     by cancelling long running simulations or by allowing only given number of simulations running
     ///     at the same time.
     /// </remarks>
-    public async Task Run(Simulation simulation)
+    public async Task Run(Simulation simulation, PlayerInfo playerInfo1, PlayerInfo playerInfo2, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Starting new simulation with id {SimulationId}", simulation.Id);
-
-        // todo: get player's settings from POST's body
-        var playerInfo1 = new PlayerInfo
-        {
-            Name = "Player 1",
-            GuessingStrategy = GuessingStrategy.Random,
-            ShipsPlacementStrategy = ShipsPlacementStrategy.Simple
-        };
-        var playerInfo2 = new PlayerInfo
-        {
-            Name = "Player 2",
-            GuessingStrategy = GuessingStrategy.Random,
-            ShipsPlacementStrategy = ShipsPlacementStrategy.Simple
-        };
-
         var (player1, player2) = CreatePlayers(playerInfo1, playerInfo2);
 
-        var winner = await Task.Run(() => RunSimulation(player1, player2));
+        var winner = await Task.Run(() => RunSimulation(player1, player2), cancellationToken);
 
         var playerDto1 = new PlayerDto
         {
@@ -77,10 +62,10 @@ public class BattleshipGameSimulator : IBattleshipGameSimulator
         simulation.IsFinished = true;
         simulation.Player1 = playerDto1;
         simulation.Player2 = playerDto2;
-        simulation.Winner = player1 == winner ? playerDto1 : playerDto2;
+        simulation.WinnerId = player1 == winner ? playerDto1.Id : playerDto2.Id;
 
         _dbContext.Simulations.Add(simulation);
-        _dbContext.SaveChanges();
+        await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
     private (Player Player1, Player Player2) CreatePlayers(PlayerInfo playerInfo1, PlayerInfo playerInfo2)
@@ -118,10 +103,10 @@ public class BattleshipGameSimulator : IBattleshipGameSimulator
     private PlayerAnswer PlayTurn(Player guessingPlayer, Player answeringPlayer)
     {
         var guess = _guessingEngine.Guess(guessingPlayer.GuessingBoard, guessingPlayer.GuessingStrategy);
-        _logger.LogInformation("Guessing: {Coords}", guess);
+        _logger.LogDebug("Guessing: {Coords}", guess);
 
         var answer = answeringPlayer.Answer(guess, out _);
-        _logger.LogInformation("Answer: {Answer}", answer);
+        _logger.LogDebug("Answer: {Answer}", answer);
 
         guessingPlayer.ApplyAnswerInfo(guess, answer);
 

@@ -1,11 +1,15 @@
 ﻿using System.Globalization;
 using BattleshipBoardGame;
 using BattleshipBoardGame.DbContext;
+using BattleshipBoardGame.Models.Api;
 using BattleshipBoardGame.Models.Entities;
 using BattleshipBoardGame.Services;
+using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Serilog.Extensions.Logging;
+using PlayerInfo = BattleshipBoardGame.Models.Entities.PlayerInfo;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,12 +24,15 @@ builder.Host.UseSerilog((_, configuration) =>
 builder.Services.AddScoped<IGuessingEngine, GuessingEngine>();
 builder.Services.AddScoped<IBoardGenerator, BoardGenerator>();
 builder.Services.AddScoped<IBattleshipGameSimulator, BattleshipGameSimulator>();
+builder.Services.AddScoped<IValidator<PlayerInfos>, PlayerInfosValidator>();
 builder.Services.AddDbContext<ISimulationsDbContext, SimulationsDbContext>(options
     => options
         .UseSqlite($"Data Source={Path.Join(Path.GetTempPath(), "simulations.db")}")
         .UseLoggerFactory(new SerilogLoggerFactory()));
 builder.Services.AddCors(options
-    => options.AddPolicy(Constants.AllowedSpecificOrigins, policy => policy.WithOrigins("http://localhost:3000")));
+    => options.AddPolicy(
+        Constants.AllowedSpecificOrigins,
+        policy => policy.WithOrigins("http://localhost:3000").AllowAnyHeader()));
 
 var app = builder.Build();
 app.Logger.LogInformation("Application created. Launching application...");
@@ -46,7 +53,6 @@ app.MapGet(
             var simulation = await dbContext.Simulations
                 .Include(simulation1 => simulation1.Player1)
                 .Include(simulation1 => simulation1.Player2)
-                .Include(simulation1 => simulation1.Winner)
                 .FirstOrDefaultAsync(s => s.Id == id);
 
             return simulation is null
@@ -61,14 +67,27 @@ app.MapGet(
 
 app.MapPost(
     "/simulations/battleship/",
-    async (IBattleshipGameSimulator simulator) =>
+    async (
+        [FromServices] IValidator<PlayerInfos> validator,
+        [FromServices] IBattleshipGameSimulator simulator,
+        [FromBody] PlayerInfos playerInfos,
+        CancellationToken cancellationToken) =>
     {
+        var validationResult = await validator.ValidateAsync(playerInfos, cancellationToken);
+        if (!validationResult.IsValid)
+        {
+            return Results.ValidationProblem(validationResult.ToDictionary());
+        }
+
+        var playerInfo1 = MapPlayerInfo(playerInfos.Infos![0]!);
+        var playerInfo2 = MapPlayerInfo(playerInfos.Infos![1]!);
+
         var id = Guid.NewGuid();
         var simulation = new Simulation { Id = id, IsFinished = false };
 
-        await simulator.Run(simulation);
+        await simulator.Run(simulation, playerInfo1, playerInfo2, cancellationToken);
 
-        return id.ToString();
+        return Results.Ok(id.ToString());
     });
 
 app.UseCors(Constants.AllowedSpecificOrigins);
@@ -76,3 +95,12 @@ app.UseCors(Constants.AllowedSpecificOrigins);
 await app.RunAsync();
 
 Log.CloseAndFlush();
+return;
+
+PlayerInfo MapPlayerInfo(BattleshipBoardGame.Models.Api.PlayerInfo playerInfo)
+    => new()
+    {
+        Name = "DefaultName",
+        GuessingStrategy = Enum.Parse<GuessingStrategy>(playerInfo.GuessingStrategy!, ignoreCase: true),
+        ShipsPlacementStrategy = Enum.Parse<ShipsPlacementStrategy>(playerInfo.ShipsPlacementStrategy!, ignoreCase: true)
+    };

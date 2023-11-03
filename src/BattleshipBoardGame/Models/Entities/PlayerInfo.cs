@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using BattleshipBoardGame.Services;
 
 namespace BattleshipBoardGame.Models.Entities;
@@ -9,7 +10,9 @@ public class PlayerInfo
 {
     public required string Name { get; init; }
 
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public required GuessingStrategy GuessingStrategy { get; init; }
 
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public ShipsPlacementStrategy ShipsPlacementStrategy { get; init; } = ShipsPlacementStrategy.Simple;
 }

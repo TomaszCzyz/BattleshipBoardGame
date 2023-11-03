@@ -13,5 +13,5 @@ public class Simulation
 
     public PlayerDto? Player2 { get; set; }
 
-    public PlayerDto? Winner { get; set; }
+    public Guid? WinnerId { get; set; }
 }
