@@ -22,7 +22,7 @@ public class Player
     ///     Note, that the guessing itself is realised by different class
     ///     so the strategy might change during the game.
     /// </summary>
-    public GuessingStrategy GuessingStrategy { get; } = GuessingStrategy.Random;
+    public GuessingStrategy GuessingStrategy { get; }
 
     /// <summary>
     ///     Keeps track of guessed coords, hit ships and coords that cannot contain ship
@@ -38,9 +38,10 @@ public class Player
     ///     Initializes a player with a given list of ships and a <see cref="GuessingBoard"/>
     ///     with all tiles set to 'unknown' state
     /// </summary>
-    public Player(IList<Ship> ships)
+    public Player(IList<Ship> ships, GuessingStrategy guessingStrategy)
     {
         _ships = ships;
+        GuessingStrategy = guessingStrategy;
         GuessingBoard = Array2dHelpers.Initialize(Constants.BoardLength);
     }
 

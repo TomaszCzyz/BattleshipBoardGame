@@ -73,7 +73,7 @@ public class BattleshipGameSimulator : IBattleshipGameSimulator
         var generateShips1 = _boardGenerator.GenerateShips(playerInfo1.ShipsPlacementStrategy);
         var generateShips2 = _boardGenerator.GenerateShips(playerInfo2.ShipsPlacementStrategy);
 
-        return (new Player(generateShips1), new Player(generateShips2));
+        return (new Player(generateShips1, playerInfo1.GuessingStrategy), new Player(generateShips2, playerInfo2.GuessingStrategy));
     }
 
     private Player? RunSimulation(Player player1, Player player2)
