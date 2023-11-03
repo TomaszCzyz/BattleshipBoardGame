@@ -37,17 +37,44 @@ public class GuessingEngineTests
         act.Should().Throw<ArgumentException>().WithMessage("All tiles on the guessing board were already guessed (Parameter 'board')");
     }
 
-    [Fact]
-    public void Guess_OneFreeTileLeft_ReturnsTileCoords()
+    [Theory]
+    [InlineData(5, 5)]
+    [InlineData(2, 3)]
+    [InlineData(7, 7)]
+    [InlineData(0, 0)]
+    [InlineData(9, 0)]
+    [InlineData(0, 9)]
+    [InlineData(9, 9)]
+    public void Guess_OneFreeTileLeft_ReturnsTileCoords(int row, int col)
     {
         // Arrange
         var board = Array2dHelpers.Initialize(Constants.BoardLength, 0);
-        board[2, 2] = -1;
+        board[row, col] = -1;
 
         // Act
-        var guess = _sut.Guess(board, GuessingStrategy.Random);
+        var guessRandom = _sut.Guess(board, GuessingStrategy.Random);
+        var guessFromCenter = _sut.Guess(board, GuessingStrategy.FromCenter);
 
         // Assert
-        guess.Should().Be((2, 2));
+        var expected = new Point(row, col);
+        guessRandom.Should().Be(expected);
+        guessFromCenter.Should().Be(expected);
+    }
+
+    [Fact]
+    public void Guess_FromCenterStrategy_ReturnsFirstClosestToCenter()
+    {
+        // Arrange
+        var board = Array2dHelpers.Initialize(Constants.BoardLength);
+        board[5, 5] = 0;
+        board[4, 5] = 0;
+        board[4, 4] = 0;
+        board[5, 4] = 0;
+
+        // Act
+        var guessFromCenter = _sut.Guess(board, GuessingStrategy.FromCenter);
+
+        // Assert
+        guessFromCenter.Should().Be(new Point(6, 4));
     }
 }

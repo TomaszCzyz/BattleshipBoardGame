@@ -2,5 +2,6 @@
 
 public enum GuessingStrategy
 {
-    Random = 0
+    Random = 0,
+    FromCenter = 1
 }
