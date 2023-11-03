@@ -62,7 +62,7 @@ function App() {
           },
           body: JSON.stringify([playerInfo1, playerInfo2]),
         })
-        .then(sim => sim.json())
+        .then(sim => sim.text())
         .catch(error => console.error(error));
 
     runNewSim().then(simId => {
