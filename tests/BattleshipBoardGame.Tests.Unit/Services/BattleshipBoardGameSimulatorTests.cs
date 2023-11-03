@@ -17,6 +17,20 @@ public class BattleshipBoardGameSimulatorTests
     private readonly IBoardGenerator _boardGenerator = Substitute.For<IBoardGenerator>();
     private readonly IGuessingEngine _guessingEngine = Substitute.For<IGuessingEngine>();
 
+    private readonly PlayerInfo _playerInfo1 = new()
+    {
+        Name = "TestName",
+        GuessingStrategy = GuessingStrategy.Random,
+        ShipsPlacementStrategy = ShipsPlacementStrategy.Simple
+    };
+
+    private readonly PlayerInfo _playerInfo2 = new()
+    {
+        Name = "TestName",
+        GuessingStrategy = GuessingStrategy.Random,
+        ShipsPlacementStrategy = ShipsPlacementStrategy.Simple
+    };
+
     public BattleshipBoardGameSimulatorTests()
     {
         _sut = new BattleshipGameSimulator(_logger, _dbContext, _boardGenerator, _guessingEngine);
@@ -39,17 +53,17 @@ public class BattleshipBoardGameSimulatorTests
         _guessingEngine.Guess(Arg.Any<sbyte[,]>(), Arg.Any<GuessingStrategy>()).Returns(shipOfB, new Point(9, 9));
 
         // Act
-        await _sut.Run(sim);
+        await _sut.Run(sim, _playerInfo1, _playerInfo2, CancellationToken.None);
 
         // Assert
         sim.Player1.Should().NotBeNull();
         sim.Player2.Should().NotBeNull();
-        sim.Winner.Should().NotBeNull();
-        sim.Winner!.Id.Should().Be(sim.Player1!.Id);
+        sim.WinnerId.Should().NotBeNull();
+        sim.WinnerId.Should().Be(sim.Player1!.Id);
 
         _boardGenerator.Received(2).GenerateShips();
         _guessingEngine.Received(2).Guess(Arg.Any<sbyte[,]>(), Arg.Any<GuessingStrategy>());
-        _dbContext.Received(1).SaveChanges();
+        await _dbContext.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
         _dbContext.Simulations.Received(1).Add(Arg.Any<Simulation>());
     }
 }
