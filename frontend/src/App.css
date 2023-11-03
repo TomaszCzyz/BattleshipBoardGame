@@ -106,11 +106,16 @@ fieldset > legend {
 .App-sim-history {
   min-width: 200px;
   margin: 10px;
-  overflow-y: scroll;
-  background: #66ccff55;
+  box-shadow: 0 6px 12px 3px #aaaaaa;
+  background: rgba(190, 217, 255, 0.33);
 }
 
-.App-sim-hist > button{
+.App-sim-history-list {
+  height: 430px;
+  overflow-y: scroll;
+}
+
+.App-sim-hist > button {
   padding: 0;
   margin: 0;
 }

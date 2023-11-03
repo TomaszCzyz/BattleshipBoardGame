@@ -33,8 +33,7 @@ function App() {
     }
     if (roundNum < 0) {
       roundNum = 0;
-    }
-    if (roundNum > sim.player1.guesses.length) {
+    } else if (roundNum > sim.player1.guesses.length) {
       roundNum = sim.player1.guesses.length;
     }
 
@@ -118,7 +117,7 @@ function App() {
                 alt="forward to the end"/>
             </button>
           </div>
-          <ol style={{height: "50px"}}>
+          <ol className="App-sim-history-list">
             {
               simulation?.player1.guesses
                 .map((guess1, i) => [guess1, simulation?.player2.guesses[i]])
