@@ -12,16 +12,19 @@ function SimulationsMenu({simulationsMenuProps}: { simulationsMenuProps: Simulat
   const [simulationNames, setSimulationNames] = useState<string[]>([]);
   // marker to trigger simulation list reloading when new simulation has been run
   const [newSimMarker, setNewSimMarker] = useState(true);
-  let playerInfo1: PlayerInfo = {
+
+  const [playerInfo1, setPlayerInfo1] = useState<PlayerInfo>({
     name: "1",
     guessingStrategy: "random",
     shipsPlacementStrategy: "simple",
-  };
-  let playerInfo2: PlayerInfo = {
+  });
+
+  const [playerInfo2, setPlayerInfo2] = useState<PlayerInfo>({
     name: "2",
     guessingStrategy: "random",
     shipsPlacementStrategy: "simple",
-  };
+  });
+
   let selectedSimIndex = 0;
 
   useEffect(() => {
@@ -40,7 +43,7 @@ function SimulationsMenu({simulationsMenuProps}: { simulationsMenuProps: Simulat
 
   const handleRunSimClick = () => {
     setNewSimMarker(!newSimMarker);
-    simulationsMenuProps.onSimRunClick(playerInfo1, playerInfo2)
+    simulationsMenuProps.onSimRunClick(playerInfo1, playerInfo2);
   };
 
   return (
@@ -58,8 +61,8 @@ function SimulationsMenu({simulationsMenuProps}: { simulationsMenuProps: Simulat
         <fieldset className="SimulationsMenu-inner-fieldset">
           <legend>Run new</legend>
           <div className="SimulationsMenu-player-settings">
-            <PlayerSettings playerInfo={playerInfo1} updatePlayerInfo={playerInfo => playerInfo1 = playerInfo}/>
-            <PlayerSettings playerInfo={playerInfo2} updatePlayerInfo={playerInfo => playerInfo2 = playerInfo}/>
+            <PlayerSettings playerInfo={playerInfo1} updatePlayerInfo={newInfo => setPlayerInfo1(newInfo)}/>
+            <PlayerSettings playerInfo={playerInfo2} updatePlayerInfo={newInfo => setPlayerInfo2(newInfo)}/>
           </div>
           <button className="SimulationsMenu-button" onClick={handleRunSimClick}>Run</button>
         </fieldset>
@@ -88,7 +91,7 @@ function PlayerSettings({playerInfo, updatePlayerInfo}: { playerInfo: PlayerInfo
         guessingStrategy: e.target.value
       })}>
         <option value="random">random</option>
-        <option value="advanced">advanced</option>
+        <option value="fromCenter">from center</option>
       </select>
     </fieldset>
   )
