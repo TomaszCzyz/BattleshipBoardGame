@@ -177,3 +177,13 @@ In that way `Player` would only store essential information about himself, such 
 or ships placement strategy. Also testing would be easier I think. And in the case of extending a service to
 more games, we could just add a new player type, without need break existing one. The simulation would take a different 
 type of `State` too.
+
+``
+### Thing that can/should be added
+- Retention policy - now, the db can only grow in size. This could be solved by adding timestamp (created date) to simulation
+and schedule a job that would remove simulations older than X. The "scheduling" can be done via `HostedService`.
+- Rate Limiting - as simulations are by definition CPU intensive tasks, so there should be a safeguard to prevent too many
+simulations running at the same time. It can be done via rate limiting on POST endpoint.
+- Authorization/Authentication - the simulation could be visible only to theirs authors. It would require "log in" functionality
+and claims checking when accessing resources.
+
