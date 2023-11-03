@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Serilog.Extensions.Logging;
-using PlayerInfo = BattleshipBoardGame.Models.Entities.PlayerInfo;
+using PlayerInfo = BattleshipBoardGame.Models.Api.PlayerInfo;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,7 +24,7 @@ builder.Host.UseSerilog((_, configuration) =>
 builder.Services.AddScoped<IGuessingEngine, GuessingEngine>();
 builder.Services.AddScoped<IBoardGenerator, BoardGenerator>();
 builder.Services.AddScoped<IBattleshipGameSimulator, BattleshipGameSimulator>();
-builder.Services.AddScoped<IValidator<PlayerInfos>, PlayerInfosValidator>();
+builder.Services.AddScoped<IValidator<PlayerInfo[]>, PlayerInfosValidator>();
 builder.Services.AddDbContext<ISimulationsDbContext, SimulationsDbContext>(options
     => options
         .UseSqlite($"Data Source={Path.Join(Path.GetTempPath(), "simulations.db")}")
@@ -68,9 +68,9 @@ app.MapGet(
 app.MapPost(
     "/simulations/battleship/",
     async (
-        [FromServices] IValidator<PlayerInfos> validator,
+        [FromServices] IValidator<PlayerInfo[]> validator,
         [FromServices] IBattleshipGameSimulator simulator,
-        [FromBody] PlayerInfos playerInfos,
+        [FromBody] PlayerInfo[] playerInfos,
         CancellationToken cancellationToken) =>
     {
         var validationResult = await validator.ValidateAsync(playerInfos, cancellationToken);
@@ -79,8 +79,8 @@ app.MapPost(
             return Results.ValidationProblem(validationResult.ToDictionary());
         }
 
-        var playerInfo1 = MapPlayerInfo(playerInfos.Infos![0]!);
-        var playerInfo2 = MapPlayerInfo(playerInfos.Infos![1]!);
+        var playerInfo1 = MapPlayerInfo(playerInfos[0]);
+        var playerInfo2 = MapPlayerInfo(playerInfos[1]);
 
         var id = Guid.NewGuid();
         var simulation = new Simulation { Id = id, IsFinished = false };
@@ -97,7 +97,7 @@ await app.RunAsync();
 Log.CloseAndFlush();
 return;
 
-PlayerInfo MapPlayerInfo(BattleshipBoardGame.Models.Api.PlayerInfo playerInfo)
+BattleshipBoardGame.Models.Entities.PlayerInfo MapPlayerInfo(PlayerInfo playerInfo)
     => new()
     {
         Name = "DefaultName",

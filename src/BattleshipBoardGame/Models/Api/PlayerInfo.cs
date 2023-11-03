@@ -14,19 +14,13 @@ public class PlayerInfo
 }
 
 [UsedImplicitly]
-public class PlayerInfos
-{
-    public PlayerInfo?[]? Infos { get; set; }
-}
-
-[UsedImplicitly]
-public class PlayerInfosValidator : AbstractValidator<PlayerInfos>
+public class PlayerInfosValidator : AbstractValidator<PlayerInfo[]>
 {
     public PlayerInfosValidator()
     {
-        RuleFor(x => x.Infos).NotNull().WithMessage("You must provide players settings in request body.");
-        RuleFor(x => x.Infos!.Length).Equal(2).WithMessage("Expected settings for exactly two player.");
-        RuleForEach(x => x.Infos).Where(info => info is not null).SetValidator(new PlayerInfoValidator()!);
+        RuleFor(x => x).NotNull().WithMessage("You must provide players settings in request body.");
+        RuleFor(x => x.Length).Equal(2).WithMessage("Expected settings for exactly two player.");
+        RuleForEach(x => x).Where(info => info is not null).SetValidator(new PlayerInfoValidator());
     }
 }
 

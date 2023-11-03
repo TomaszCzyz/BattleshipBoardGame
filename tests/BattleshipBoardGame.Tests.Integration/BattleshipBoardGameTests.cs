@@ -1,13 +1,11 @@
 using System.Net;
 using System.Net.Http.Json;
 using BattleshipBoardGame.DbContext;
-using BattleshipBoardGame.Models.Api;
 using BattleshipBoardGame.Models.Entities;
 using BattleshipBoardGame.Services;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
-using PlayerInfo = BattleshipBoardGame.Models.Api.PlayerInfo;
 
 namespace BattleshipBoardGame.Tests.Integration;
 
@@ -29,7 +27,7 @@ public class BattleshipBoardGameTests : IClassFixture<CustomWebApplicationFactor
         // Arrange
         var client = _factory.CreateClient();
         var id = Guid.NewGuid();
-        var testPlayerInfo = new Models.Entities.PlayerInfo
+        var testPlayerInfo = new PlayerInfo
         {
             Name = "TestName",
             GuessingStrategy = GuessingStrategy.Random,
@@ -106,13 +104,10 @@ public class BattleshipBoardGameTests : IClassFixture<CustomWebApplicationFactor
     {
         // Arrange
         var client = _factory.CreateClient();
-        var playerInfos = new PlayerInfos
+        var playerInfos = new Models.Api.PlayerInfo[]
         {
-            Infos = new PlayerInfo[]
-            {
-                new() { GuessingStrategy = "Random", ShipsPlacementStrategy = "Simple" },
-                new() { GuessingStrategy = "Random", ShipsPlacementStrategy = "Simple" }
-            }
+            new() { GuessingStrategy = "Random", ShipsPlacementStrategy = "Simple" },
+            new() { GuessingStrategy = "Random", ShipsPlacementStrategy = "Simple" }
         };
 
         // Act
@@ -133,13 +128,10 @@ public class BattleshipBoardGameTests : IClassFixture<CustomWebApplicationFactor
         // Arrange
         var invalidStrategyName = "InvalidStrategyName";
         var client = _factory.CreateClient();
-        var playerInfos = new PlayerInfos
+        var playerInfos = new Models.Api.PlayerInfo[]
         {
-            Infos = new PlayerInfo[]
-            {
-                new() { GuessingStrategy = invalidStrategyName, ShipsPlacementStrategy = "Simple" },
-                new() { GuessingStrategy = "Random", ShipsPlacementStrategy = "Simple" }
-            }
+            new() { GuessingStrategy = invalidStrategyName, ShipsPlacementStrategy = "Simple" },
+            new() { GuessingStrategy = "Random", ShipsPlacementStrategy = "Simple" }
         };
 
         // Act
